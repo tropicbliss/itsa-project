@@ -1,9 +1,8 @@
 import { Handler } from "aws-lambda";
-import { Resource } from "sst";
 
-export const handler: Handler = async (_event) => {
+export const handler: Handler = async (event) => {
   return {
     statusCode: 200,
-    body: Resource.Region.region,
+    body: JSON.stringify(event.headers),
   };
 };
