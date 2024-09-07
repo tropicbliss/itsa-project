@@ -7,10 +7,6 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
-    "Uploads": {
-      "name": string
-      "type": "sst.aws.Bucket"
-    }
   }
 }
 export {}
