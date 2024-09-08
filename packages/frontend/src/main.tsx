@@ -1,10 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
 import './index.css'
 import { BrowserRouter as Router } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import config from "./config.ts";
+import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from './components/theme-provider.tsx';
+import { App } from './App.tsx';
 
 Amplify.configure({
   Auth: {
@@ -17,7 +19,7 @@ Amplify.configure({
   API: {
     endpoints: [
       {
-        name: "notes",
+        name: "api",
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
       },
@@ -28,7 +30,10 @@ Amplify.configure({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Router>
-      <App />
+      <ThemeProvider storageKey="vite-ui-theme">
+        <App />
+      </ThemeProvider>
+      <Toaster />
     </Router>
   </StrictMode>,
 )
