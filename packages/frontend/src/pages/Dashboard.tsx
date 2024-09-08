@@ -1,3 +1,3 @@
 export function Dashboard() {
-    return <div>Success!</div>
+  return <div>Success!</div>;
 }
