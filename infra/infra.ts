@@ -1,6 +1,4 @@
-const region = new sst.Linkable("Region", {
-  properties: { region: aws.getRegionOutput().name }
-});
+const region = aws.getRegionOutput().name
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool")
 
@@ -24,7 +22,7 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
         resources: [
           $concat(
             "arn:aws:execute-api:",
-            region.properties.region,
+            region,
             ":",
             aws.getCallerIdentityOutput({}).accountId,
             ":",
@@ -37,7 +35,20 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   },
 });
 
+const authorizer = api.addAuthorizer({
+  name: "jwtAuthorizer",
+  jwt: {
+    issuer: $interpolate`https://cognito-idp.${region}.amazonaws.com/${userPool.id}`,
+    audiences: [userPoolClient.id]
+  }
+})
+
 api.route("GET /", {
-  link: [region],
   handler: "packages/functions/src/api.handler",
+}, {
+  auth: {
+    jwt: {
+      authorizer: authorizer.id
+    }
+  }
 });

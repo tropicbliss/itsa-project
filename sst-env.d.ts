@@ -11,10 +11,6 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
-    "Region": {
-      "region": string
-      "type": "sst.sst.Linkable"
-    }
     "UserPool": {
       "id": string
       "type": "sst.aws.CognitoUserPool"
