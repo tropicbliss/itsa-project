@@ -1,20 +1,21 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 
-export type Options = {
+export type UtilOptions = {
   allowedGroups?: string[];
 };
 
 export module Util {
   export function handler(
-    options: Options,
+    options: UtilOptions,
     lambda: (evt: APIGatewayProxyEvent, context: Context) => Promise<string>
   ) {
     return async function (event: APIGatewayProxyEvent, context: Context) {
+      const { allowedGroups } = options;
       let body: string, statusCode: number;
       const isAllowed =
-        options.allowedGroups === undefined
+        allowedGroups === undefined
           ? true
-          : isUserAllowed(event, options.allowedGroups);
+          : isUserAllowed(event, allowedGroups);
       if (isAllowed) {
         try {
           body = await lambda(event, context);
