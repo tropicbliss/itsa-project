@@ -53,7 +53,7 @@ function isUserAllowed(
         event.headers.authorization!.split(".")[1],
         "base64"
       ).toString()
-    )["cognito:groups"]
+    )["cognito:groups"] ?? []
   );
   return haveIntersection(innerAllowedGroups, partOfGroups);
 }
