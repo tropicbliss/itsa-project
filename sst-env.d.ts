@@ -7,6 +7,10 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "EmailSendingService": {
+      "sender": string
+      "type": "sst.aws.Email"
+    }
     "Frontend": {
       "type": "sst.aws.StaticSite"
       "url": string

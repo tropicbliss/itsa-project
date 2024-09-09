@@ -1,13 +1,13 @@
-const region = aws.getRegionOutput().name
+const region = aws.getRegionOutput().name;
 
-export const userPool = new sst.aws.CognitoUserPool("UserPool")
+export const userPool = new sst.aws.CognitoUserPool("UserPool");
 
-export const userPoolClient = userPool.addClient("UserPoolClient")
+export const userPoolClient = userPool.addClient("UserPoolClient");
 
 export const api = new sst.aws.ApiGatewayV2("Api", {
   cors: {
-    allowHeaders: ["Authorization"]
-  }
+    allowHeaders: ["Authorization"],
+  },
 });
 
 export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
@@ -20,9 +20,7 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   permissions: {
     authenticated: [
       {
-        actions: [
-          "execute-api:*",
-        ],
+        actions: ["execute-api:*"],
         resources: [
           $concat(
             "arn:aws:execute-api:",
@@ -43,19 +41,28 @@ const authorizer = api.addAuthorizer({
   name: "jwtAuthorizer",
   jwt: {
     issuer: $interpolate`https://cognito-idp.${region}.amazonaws.com/${userPool.id}`,
-    audiences: [userPoolClient.id]
-  }
-})
-
-api.route("GET /", {
-  handler: "packages/functions/src/api.handler",
-}, {
-  auth: {
-    jwt: {
-      authorizer: authorizer.id
-    }
-  }
+    audiences: [userPoolClient.id],
+  },
 });
+
+export const email = new sst.aws.Email("EmailSendingService", {
+  sender: "eugenetoh54@gmail.com",
+});
+
+api.route(
+  "GET /",
+  {
+    handler: "packages/functions/src/api.handler",
+    link: [email],
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
 
 export const frontend = new sst.aws.StaticSite("Frontend", {
   path: "packages/frontend",
