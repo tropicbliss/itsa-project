@@ -4,7 +4,11 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool")
 
 export const userPoolClient = userPool.addClient("UserPoolClient")
 
-export const api = new sst.aws.ApiGatewayV2("Api");
+export const api = new sst.aws.ApiGatewayV2("Api", {
+  cors: {
+    allowHeaders: ["Authorization"]
+  }
+});
 
 export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   userPools: [
