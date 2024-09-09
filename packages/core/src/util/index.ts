@@ -1,13 +1,20 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 
+export type Options = {
+  allowedGroups?: string[];
+};
+
 export module Util {
   export function handler(
-    allowedGroups: string[],
+    options: Options,
     lambda: (evt: APIGatewayProxyEvent, context: Context) => Promise<string>
   ) {
     return async function (event: APIGatewayProxyEvent, context: Context) {
       let body: string, statusCode: number;
-      const isAllowed = isUserAllowed(event, allowedGroups);
+      const isAllowed =
+        options.allowedGroups === undefined
+          ? true
+          : isUserAllowed(event, options.allowedGroups);
       if (isAllowed) {
         try {
           body = await lambda(event, context);
@@ -38,9 +45,7 @@ function isUserAllowed(
   event: APIGatewayProxyEvent,
   allowedGroups: string[]
 ): boolean {
-  if (allowedGroups.length === 0) {
-    return true;
-  }
+  const innerAllowedGroups = new Set(allowedGroups);
   const partOfGroups: Set<String> = new Set(
     JSON.parse(
       Buffer.from(
@@ -49,7 +54,7 @@ function isUserAllowed(
       ).toString()
     )["cognito:groups"]
   );
-  return haveIntersection(new Set(allowedGroups), partOfGroups);
+  return haveIntersection(innerAllowedGroups, partOfGroups);
 }
 
 function haveIntersection(setA: Set<String>, setB: Set<String>) {
