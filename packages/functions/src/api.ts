@@ -22,7 +22,7 @@ export const handler = Util.handler(
             },
             Body: {
               Text: {
-                Data: "Bonjour!",
+                Data: "Mixolydian!",
               },
             },
           },

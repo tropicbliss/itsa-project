@@ -49,6 +49,10 @@ export const email = new sst.aws.Email("EmailSendingService", {
   sender: "eugenetoh54@gmail.com",
 });
 
+export const vpc = new sst.aws.Vpc("Database");
+
+export const database = new sst.aws.Postgres("ClientDatabase", { vpc });
+
 api.route(
   "GET /",
   {

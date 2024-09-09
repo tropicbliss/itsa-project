@@ -7,6 +7,16 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "ClientDatabase": {
+      "clusterArn": string
+      "database": string
+      "host": string
+      "password": string
+      "port": number
+      "secretArn": string
+      "type": "sst.aws.Postgres"
+      "username": string
+    }
     "EmailSendingService": {
       "sender": string
       "type": "sst.aws.Email"
