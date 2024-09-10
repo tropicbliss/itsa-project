@@ -2,7 +2,9 @@ export const region = new sst.Linkable("Region", {
   properties: { name: aws.getRegionOutput().name },
 });
 
-export const userPool = new sst.aws.CognitoUserPool("UserPool");
+export const userPool = new sst.aws.CognitoUserPool("UserPool", {
+  aliases: ["email"],
+});
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
 
@@ -84,7 +86,6 @@ const rootAdminUser = new aws.cognito.User("rootAdminUser", {
     email_verified: "true",
     given_name: "Root",
     family_name: "Admin",
-    email: rootUserEmail.value,
   },
   password: rootUserPassword.value,
 });
