@@ -24,9 +24,7 @@ import { Auth } from "aws-amplify";
 import { z } from "zod";
 
 const formSchema = z.object({
-  username: z.string().min(1, {
-    message: "Username must not be empty",
-  }),
+  email: z.string().email(),
   password: z.string().min(1, {
     message: "Password must not be empty",
   }),
@@ -37,13 +35,13 @@ export function LoginForm() {
   const { userHasAuthenticated } = useAppContext();
 
   const form = createForm(formSchema, {
-    username: "",
+    email: "",
     password: "",
   });
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await Auth.signIn(values.username, values.password);
+      await Auth.signIn(values.email, values.password);
       userHasAuthenticated(true);
     } catch (error) {
       const errorDescription = extractErrorMessage(error);
@@ -70,12 +68,12 @@ export function LoginForm() {
               <div className="grid gap-2">
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="johndoe" {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

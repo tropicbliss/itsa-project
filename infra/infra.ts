@@ -1,4 +1,6 @@
-const region = aws.getRegionOutput().name;
+export const region = new sst.Linkable("Region", {
+  properties: { name: aws.getRegionOutput().name },
+});
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool");
 
@@ -24,7 +26,7 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
         resources: [
           $concat(
             "arn:aws:execute-api:",
-            region,
+            region.properties.name,
             ":",
             aws.getCallerIdentityOutput({}).accountId,
             ":",
@@ -40,7 +42,7 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
 const authorizer = api.addAuthorizer({
   name: "jwtAuthorizer",
   jwt: {
-    issuer: $interpolate`https://cognito-idp.${region}.amazonaws.com/${userPool.id}`,
+    issuer: $interpolate`https://cognito-idp.${region.properties.name}.amazonaws.com/${userPool.id}`,
     audiences: [userPoolClient.id],
   },
 });
@@ -50,10 +52,6 @@ const placeholderEmail = new sst.Secret("PlaceholderEmail");
 export const email = new sst.aws.Email("EmailSendingService", {
   sender: placeholderEmail.value,
 });
-
-// export const vpc = new sst.aws.Vpc("Database");
-
-// export const database = new sst.aws.Postgres("ClientDatabase", { vpc });
 
 const rootAdmin = new aws.cognito.UserGroup("rootAdmin", {
   userPoolId: userPool.id,
@@ -67,16 +65,26 @@ const agent = new aws.cognito.UserGroup("agent", {
   userPoolId: userPool.id,
 });
 
+export const userGroups = new sst.Linkable("UserGroups", {
+  properties: {
+    rootAdmin: rootAdmin.name,
+    admin: admin.name,
+    agent: agent.name,
+  },
+});
+
 const rootUserEmail = new sst.Secret("RootUserEmail");
 
 const rootUserPassword = new sst.Secret("RootUserPassword");
 
 const rootAdminUser = new aws.cognito.User("rootAdminUser", {
-  username: "rootadmin",
+  username: rootUserEmail.value,
   userPoolId: userPool.id,
   attributes: {
-    email: rootUserEmail.value,
     email_verified: "true",
+    given_name: "Root",
+    family_name: "Admin",
+    email: rootUserEmail.value,
   },
   password: rootUserPassword.value,
 });
@@ -94,10 +102,10 @@ new aws.cognito.UserInGroup("rootAdminInAdminGroup", {
 });
 
 api.route(
-  "GET /",
+  "GET /users",
   {
-    handler: "packages/functions/src/api.handler",
-    link: [email],
+    link: [region, userGroups, userPool],
+    handler: "packages/functions/src/getusers.handler",
   },
   {
     auth: {
@@ -115,7 +123,7 @@ export const frontend = new sst.aws.StaticSite("Frontend", {
     command: "npm run build",
   },
   environment: {
-    VITE_REGION: region,
+    VITE_REGION: region.properties.name,
     VITE_API_URL: api.url,
     VITE_USER_POOL_ID: userPool.id,
     VITE_IDENTITY_POOL_ID: identityPool.id,

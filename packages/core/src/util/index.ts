@@ -7,11 +7,11 @@ export type UtilOptions = {
 export module Util {
   export function handler(
     options: UtilOptions,
-    lambda: (evt: APIGatewayProxyEvent, context: Context) => Promise<string>
+    lambda: (evt: APIGatewayProxyEvent, context: Context) => Promise<object>
   ) {
     return async function (event: APIGatewayProxyEvent, context: Context) {
       const { allowedGroups } = options;
-      let body: string, statusCode: number;
+      let body: object, statusCode: number;
       const isAllowed =
         allowedGroups === undefined
           ? true
@@ -22,16 +22,19 @@ export module Util {
           statusCode = 200;
         } catch (error) {
           statusCode = 500;
-          body = JSON.stringify({
+          body = {
             error: error instanceof Error ? error.message : String(error),
-          });
+          };
         }
       } else {
         statusCode = 403;
-        body = "User does not have sufficient privileges to call this function";
+        body = {
+          error:
+            "User does not have sufficient privileges to call this function",
+        };
       }
       return {
-        body,
+        body: JSON.stringify(body),
         statusCode,
         headers: {
           "Access-Control-Allow-Origin": "*",

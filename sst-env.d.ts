@@ -23,6 +23,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "Region": {
+      "name": string
+      "type": "sst.sst.Linkable"
+    }
     "RootUserEmail": {
       "type": "sst.sst.Secret"
       "value": string
@@ -30,6 +34,12 @@ declare module "sst" {
     "RootUserPassword": {
       "type": "sst.sst.Secret"
       "value": string
+    }
+    "UserGroups": {
+      "admin": string
+      "agent": string
+      "rootAdmin": string
+      "type": "sst.sst.Linkable"
     }
     "UserPool": {
       "id": string

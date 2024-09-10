@@ -1,4 +1,4 @@
-import { AdminDashboard } from "@/containers/AdminDashboard";
+import { DataTableDemo } from "@/containers/AdminDashboard";
 import { AgentDashboard } from "@/containers/AgentDashboard";
 import { useToast } from "@/hooks/use-toast";
 import { getUserGroups } from "@/lib/auth";
@@ -25,7 +25,7 @@ export function Dashboard() {
     userGroups?.includes(import.meta.env.VITE_ADMIN_GROUP) ||
     userGroups?.includes(import.meta.env.VITE_ROOT_ADMIN_GROUP)
   ) {
-    return <AdminDashboard />;
+    return <DataTableDemo />;
   }
 
   if (userGroups?.includes(import.meta.env.VITE_AGENT_GROUP)) {
