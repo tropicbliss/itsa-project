@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/lib/contextLib";
+import { extractErrorMessage } from "@/lib/error";
 import { createForm } from "@/lib/forms";
 import { Auth } from "aws-amplify";
 import { z } from "zod";
@@ -45,12 +46,7 @@ export function LoginForm() {
       await Auth.signIn(values.username, values.password);
       userHasAuthenticated(true);
     } catch (error) {
-      let errorDescription: string;
-      if (error instanceof Error) {
-        errorDescription = error.message;
-      } else {
-        errorDescription = String(error);
-      }
+      const errorDescription = extractErrorMessage(error);
       toast({
         variant: "destructive",
         title: "An error occurred logging in",

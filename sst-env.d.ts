@@ -7,16 +7,6 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
-    "ClientDatabase": {
-      "clusterArn": string
-      "database": string
-      "host": string
-      "password": string
-      "port": number
-      "secretArn": string
-      "type": "sst.aws.Postgres"
-      "username": string
-    }
     "EmailSendingService": {
       "sender": string
       "type": "sst.aws.Email"
@@ -28,6 +18,18 @@ declare module "sst" {
     "IdentityPool": {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
+    }
+    "PlaceholderEmail": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "RootUserEmail": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "RootUserPassword": {
+      "type": "sst.sst.Secret"
+      "value": string
     }
     "UserPool": {
       "id": string

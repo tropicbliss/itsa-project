@@ -45,13 +45,53 @@ const authorizer = api.addAuthorizer({
   },
 });
 
+const placeholderEmail = new sst.Secret("PlaceholderEmail");
+
 export const email = new sst.aws.Email("EmailSendingService", {
-  sender: "eugenetoh54@gmail.com",
+  sender: placeholderEmail.value,
 });
 
-export const vpc = new sst.aws.Vpc("Database");
+// export const vpc = new sst.aws.Vpc("Database");
 
-export const database = new sst.aws.Postgres("ClientDatabase", { vpc });
+// export const database = new sst.aws.Postgres("ClientDatabase", { vpc });
+
+const rootAdmin = new aws.cognito.UserGroup("rootAdmin", {
+  userPoolId: userPool.id,
+});
+
+const admin = new aws.cognito.UserGroup("admin", {
+  userPoolId: userPool.id,
+});
+
+new aws.cognito.UserGroup("agent", {
+  userPoolId: userPool.id,
+});
+
+const rootUserEmail = new sst.Secret("RootUserEmail");
+
+const rootUserPassword = new sst.Secret("RootUserPassword");
+
+const rootAdminUser = new aws.cognito.User("rootAdminUser", {
+  username: "rootadmin",
+  userPoolId: userPool.id,
+  attributes: {
+    email: rootUserEmail.value,
+    email_verified: "true",
+  },
+  password: rootUserPassword.value,
+});
+
+new aws.cognito.UserInGroup("rootAdminInRootAdminGroup", {
+  groupName: rootAdmin.name,
+  username: rootAdminUser.username,
+  userPoolId: userPool.id,
+});
+
+new aws.cognito.UserInGroup("rootAdminInAdminGroup", {
+  groupName: admin.name,
+  username: rootAdminUser.username,
+  userPoolId: userPool.id,
+});
 
 api.route(
   "GET /",

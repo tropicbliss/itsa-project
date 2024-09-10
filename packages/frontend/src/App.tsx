@@ -32,10 +32,11 @@ export function App() {
 function AuthorizedWrapper() {
   return (
     <>
-      <div className="sm:px-6 lg:px-8 py-3">
+      <div className="flex min-h-screen w-full flex-col">
         <Navbar />
-        <div className="py-3"></div>
-        <Routes />
+        <main className="p-4 md:p-8">
+          <Routes />
+        </main>
       </div>
     </>
   );
