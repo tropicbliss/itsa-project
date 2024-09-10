@@ -63,7 +63,7 @@ const admin = new aws.cognito.UserGroup("admin", {
   userPoolId: userPool.id,
 });
 
-new aws.cognito.UserGroup("agent", {
+const agent = new aws.cognito.UserGroup("agent", {
   userPoolId: userPool.id,
 });
 
@@ -120,5 +120,8 @@ export const frontend = new sst.aws.StaticSite("Frontend", {
     VITE_USER_POOL_ID: userPool.id,
     VITE_IDENTITY_POOL_ID: identityPool.id,
     VITE_USER_POOL_CLIENT_ID: userPoolClient.id,
+    VITE_ROOT_ADMIN_GROUP: rootAdmin.name,
+    VITE_ADMIN_GROUP: admin.name,
+    VITE_AGENT_GROUP: agent.name,
   },
 });

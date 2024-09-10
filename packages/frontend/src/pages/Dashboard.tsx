@@ -1,21 +1,36 @@
-import { Button } from "@/components/ui/button";
-import { get } from "@/lib/fetchLib";
-import { useState } from "react";
+import { AdminDashboard } from "@/containers/AdminDashboard";
+import { AgentDashboard } from "@/containers/AgentDashboard";
+import { useToast } from "@/hooks/use-toast";
+import { getUserGroups } from "@/lib/auth";
+import { extractErrorMessage } from "@/lib/error";
+import { useEffect, useState } from "react";
 
 export function Dashboard() {
-  const [loading, setLoading] = useState(false);
+  const [userGroups, setUserGroups] = useState<string[] | null>(null);
+  const { toast } = useToast();
 
-  return (
-    <Button
-      disabled={loading}
-      onClick={async () => {
-        setLoading(true);
-        const res = await get("/");
-        console.log(res);
-        setLoading(false);
-      }}
-    >
-      Send
-    </Button>
-  );
+  useEffect(() => {
+    getUserGroups()
+      .then((userGroups) => setUserGroups(userGroups))
+      .catch((error) => {
+        const errorDescription = extractErrorMessage(error);
+        toast({
+          variant: "destructive",
+          description: `Error fetching user groups: ${errorDescription}`,
+        });
+      });
+  }, []);
+
+  if (
+    userGroups?.includes(import.meta.env.VITE_ADMIN_GROUP) ||
+    userGroups?.includes(import.meta.env.VITE_ROOT_ADMIN_GROUP)
+  ) {
+    return <AdminDashboard />;
+  }
+
+  if (userGroups?.includes(import.meta.env.VITE_AGENT_GROUP)) {
+    return <AgentDashboard />;
+  }
+
+  return <></>;
 }
