@@ -1,0 +1,46 @@
+import { Util } from "@itsa-project/core/util";
+import { Resource } from "sst";
+import {
+  CognitoIdentityProviderClient,
+  AdminListGroupsForUserCommand,
+  AdminDisableUserCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
+import { z } from "zod";
+
+const schema = z.object({
+  id: z.string(),
+});
+
+const client = new CognitoIdentityProviderClient({
+  region: Resource.Region.name,
+});
+
+async function disableUser(id: string, targetGroups: string[]) {
+  const checkCommand = new AdminListGroupsForUserCommand({
+    Username: id,
+    UserPoolId: Resource.UserPool.id,
+  });
+  const response = await client.send(checkCommand);
+  if (!targetGroups.includes(response.Groups![0].GroupName!)) {
+    throw Error();
+  }
+  const disableCommand = new AdminDisableUserCommand({
+    UserPoolId: Resource.UserPool.id,
+    Username: id,
+  });
+  await client.send(disableCommand);
+}
+
+export const handler = Util.handler(
+  {
+    allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
+  },
+  async ({ evt, userGroup }) => {
+    const input = schema.parse(evt.body);
+    const allowedToDisable = [Resource.UserGroups.agent];
+    if (userGroup === Resource.UserGroups.rootAdmin) {
+      allowedToDisable.push(Resource.UserGroups.admin);
+    }
+    await disableUser(input.id, allowedToDisable);
+  }
+);

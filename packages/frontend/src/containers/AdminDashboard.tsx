@@ -184,7 +184,7 @@ export function DataTableDemo() {
   const [rowSelection, setRowSelection] = React.useState({});
 
   React.useEffect(() => {
-    get("/users").then((res) => {
+    get("/admin/users").then((res) => {
       console.log(res);
     });
   }, []);

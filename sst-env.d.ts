@@ -7,10 +7,6 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
-    "EmailSendingService": {
-      "sender": string
-      "type": "sst.aws.Email"
-    }
     "Frontend": {
       "type": "sst.aws.StaticSite"
       "url": string
@@ -18,10 +14,6 @@ declare module "sst" {
     "IdentityPool": {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
-    }
-    "PlaceholderEmail": {
-      "type": "sst.sst.Secret"
-      "value": string
     }
     "Region": {
       "name": string

@@ -1,48 +1,68 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import {
-  AdminListGroupsForUserCommand,
+  AttributeType,
   CognitoIdentityProviderClient,
-  ListUsersCommand,
+  ListUsersInGroupCommand,
+  UserType,
 } from "@aws-sdk/client-cognito-identity-provider";
 
 const client = new CognitoIdentityProviderClient({
   region: Resource.Region.name,
 });
 
-async function getUserGroups(username: string) {
-  const command = new AdminListGroupsForUserCommand({
+async function getUsersInGroup(group: string) {
+  const command = new ListUsersInGroupCommand({
+    GroupName: group,
     UserPoolId: Resource.UserPool.id,
-    Username: username,
   });
   const response = await client.send(command);
-  return response.Groups || [];
+  return response.Users!;
 }
+
+function extractValueInAttribute(
+  attribute: AttributeType[],
+  attributeName: string
+) {
+  return attribute.find((attribute) => attribute.Name === attributeName)!
+    .Value!;
+}
+
+function getUserFromResponse(user: UserType, role: string): User {
+  const attribute = user.Attributes!;
+  return {
+    email: extractValueInAttribute(attribute, "email"),
+    firstName: extractValueInAttribute(attribute, "given_name"),
+    id: user.Username!,
+    lastName: extractValueInAttribute(attribute, "family_name"),
+    role: role.split("-")[0],
+  };
+}
+
+type User = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+};
 
 export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
-  async (event) => {
-    const command = new ListUsersCommand({
-      UserPoolId: Resource.UserPool.id,
-    });
-    const response = await client.send(command);
-    const users = response.Users!;
-    const usersWithGroups = await Promise.all(
-      users.map(async (user) => {
-        const userGroups = await getUserGroups(user.Username!);
-        return {
-          email: user.Username,
-          firstName: user.Attributes?.find((val) => val.Name === "given_name")
-            ?.Value,
-          lastName: user.Attributes?.find((val) => val.Name === "family_name")
-            ?.Value,
-          id: user.Attributes?.find((val) => val.Name === "sub")?.Value,
-          userGroups: userGroups.map((userGroup) => userGroup.GroupName),
-        };
-      })
-    );
-    return usersWithGroups;
+  async ({ userGroup }) => {
+    let users: User[] = [];
+    const usersInAgentRole = await getUsersInGroup(Resource.UserGroups.agent);
+    for (const attribute of usersInAgentRole) {
+      users.push(getUserFromResponse(attribute, Resource.UserGroups.agent));
+    }
+    if (userGroup === Resource.UserGroups.rootAdmin) {
+      const usersInAdminRole = await getUsersInGroup(Resource.UserGroups.admin);
+      for (const attribute of usersInAdminRole) {
+        users.push(getUserFromResponse(attribute, Resource.UserGroups.admin));
+      }
+    }
+    return users;
   }
 );

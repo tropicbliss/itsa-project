@@ -49,12 +49,6 @@ const authorizer = api.addAuthorizer({
   },
 });
 
-const placeholderEmail = new sst.Secret("PlaceholderEmail");
-
-export const email = new sst.aws.Email("EmailSendingService", {
-  sender: placeholderEmail.value,
-});
-
 const rootAdmin = new aws.cognito.UserGroup("rootAdmin", {
   userPoolId: userPool.id,
 });
@@ -80,12 +74,13 @@ const rootUserEmail = new sst.Secret("RootUserEmail");
 const rootUserPassword = new sst.Secret("RootUserPassword");
 
 const rootAdminUser = new aws.cognito.User("rootAdminUser", {
-  username: rootUserEmail.value,
+  username: "rootadmin",
   userPoolId: userPool.id,
   attributes: {
     email_verified: "true",
     given_name: "Root",
     family_name: "Admin",
+    email: rootUserEmail.value,
   },
   password: rootUserPassword.value,
 });
@@ -96,17 +91,41 @@ new aws.cognito.UserInGroup("rootAdminInRootAdminGroup", {
   userPoolId: userPool.id,
 });
 
-new aws.cognito.UserInGroup("rootAdminInAdminGroup", {
-  groupName: admin.name,
-  username: rootAdminUser.username,
-  userPoolId: userPool.id,
-});
-
 api.route(
-  "GET /users",
+  "GET /admin/users",
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/getusers.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "DELETE /admin/user",
+  {
+    link: [region, userGroups, userPool],
+    handler: "packages/functions/src/deleteuser.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "POST /admin/disableuser",
+  {
+    link: [region, userGroups, userPool],
+    handler: "packages/functions/src/disableuser.handler",
   },
   {
     auth: {

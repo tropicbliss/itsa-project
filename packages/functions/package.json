@@ -5,7 +5,8 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.645.0",
     "@aws-sdk/client-sesv2": "^3.645.0",
     "@itsa-project/core": "*",
-    "sst": "*"
+    "sst": "*",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.137"

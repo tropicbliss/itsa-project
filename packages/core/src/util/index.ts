@@ -4,21 +4,25 @@ export type UtilOptions = {
   allowedGroups?: string[];
 };
 
+export type Input = {
+  evt: APIGatewayProxyEvent;
+  context: Context;
+  userGroup: string;
+};
+
 export module Util {
   export function handler(
     options: UtilOptions,
-    lambda: (evt: APIGatewayProxyEvent, context: Context) => Promise<object>
+    lambda: (input: Input) => Promise<object | void>
   ) {
     return async function (event: APIGatewayProxyEvent, context: Context) {
       const { allowedGroups } = options;
-      let body: object, statusCode: number;
-      const isAllowed =
-        allowedGroups === undefined
-          ? true
-          : isUserAllowed(event, allowedGroups);
+      let body: object | void, statusCode: number;
+      const userInGroup = getUserGroup(event);
+      const isAllowed = allowedGroups?.includes(userInGroup) ?? true;
       if (isAllowed) {
         try {
-          body = await lambda(event, context);
+          body = await lambda({ evt: event, context, userGroup: userInGroup });
           statusCode = 200;
         } catch (error) {
           statusCode = 500;
@@ -34,7 +38,7 @@ export module Util {
         };
       }
       return {
-        body: JSON.stringify(body),
+        body: body ? JSON.stringify(body) : "",
         statusCode,
         headers: {
           "Access-Control-Allow-Origin": "*",
@@ -45,22 +49,8 @@ export module Util {
   }
 }
 
-function isUserAllowed(
-  event: APIGatewayProxyEvent,
-  allowedGroups: string[]
-): boolean {
-  const innerAllowedGroups = new Set(allowedGroups);
-  const partOfGroups: Set<String> = new Set(
-    JSON.parse(
-      Buffer.from(
-        event.headers.authorization!.split(".")[1],
-        "base64"
-      ).toString()
-    )["cognito:groups"] ?? []
-  );
-  return haveIntersection(innerAllowedGroups, partOfGroups);
-}
-
-function haveIntersection(setA: Set<String>, setB: Set<String>) {
-  return [...setA].some((item) => setB.has(item));
+function getUserGroup(event: APIGatewayProxyEvent): string {
+  return JSON.parse(
+    Buffer.from(event.headers.authorization!.split(".")[1], "base64").toString()
+  )["cognito:groups"][0];
 }
