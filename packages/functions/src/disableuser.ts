@@ -9,7 +9,7 @@ import { z } from "zod";
 import { VisibleError } from "@itsa-project/core/util/visibleError";
 
 const schema = z.object({
-  id: z.string(),
+  id: z.string().min(1),
 });
 
 const client = new CognitoIdentityProviderClient({

@@ -136,6 +136,36 @@ api.route(
   }
 );
 
+api.route(
+  "POST /admin/user",
+  {
+    link: [region, userGroups, userPool],
+    handler: "packages/functions/src/createuser.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "PUT /admin/user",
+  {
+    link: [region, userGroups, userPool],
+    handler: "packages/functions/src/updateuser.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
 export const frontend = new sst.aws.StaticSite("Frontend", {
   path: "packages/frontend",
   build: {

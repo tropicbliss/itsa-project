@@ -56,7 +56,7 @@ export const handler = Util.handler(
     const usersInAgentRole = await getUsersInGroup(Resource.UserGroups.agent);
     for (const attribute of usersInAgentRole) {
       const user = getUserFromResponse(attribute, Resource.UserGroups.agent);
-      if (user.id !== userId) {
+      if (user.id === userId) {
         users.push(user);
       }
     }
@@ -66,7 +66,7 @@ export const handler = Util.handler(
       );
       for (const attribute of usersInAdminRole) {
         const user = getUserFromResponse(attribute, Resource.UserGroups.admin);
-        if (user.id !== userId) {
+        if (user.id === userId) {
           users.push(user);
         }
       }
