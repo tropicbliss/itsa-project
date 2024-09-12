@@ -1,4 +1,5 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
+import { VisibleError } from "./visibleError";
 
 export type UtilOptions = {
   allowedGroups?: string[];
@@ -8,6 +9,7 @@ export type Input = {
   evt: APIGatewayProxyEvent;
   context: Context;
   userGroup: string;
+  userId: string;
 };
 
 export module Util {
@@ -22,13 +24,25 @@ export module Util {
       const isAllowed = allowedGroups?.includes(userInGroup) ?? true;
       if (isAllowed) {
         try {
-          body = await lambda({ evt: event, context, userGroup: userInGroup });
+          body = await lambda({
+            evt: event,
+            context,
+            userGroup: userInGroup,
+            userId: event.requestContext.authorizer!.jwt.claims.username,
+          });
           statusCode = 200;
         } catch (error) {
-          statusCode = 500;
-          body = {
-            error: error instanceof Error ? error.message : String(error),
-          };
+          if (error instanceof VisibleError) {
+            statusCode = 400;
+            body = {
+              error: error.message,
+            };
+          } else {
+            statusCode = 500;
+            body = {
+              error: "Something went horribly wrong",
+            };
+          }
         }
       } else {
         statusCode = 403;

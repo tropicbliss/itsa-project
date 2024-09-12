@@ -6,6 +6,7 @@ import {
   AdminListGroupsForUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { z } from "zod";
+import { VisibleError } from "@itsa-project/core/util/visibleError";
 
 const schema = z.object({
   id: z.string(),
@@ -22,7 +23,7 @@ async function deleteUser(id: string, targetGroups: string[]) {
   });
   const response = await client.send(checkCommand);
   if (!targetGroups.includes(response.Groups![0].GroupName!)) {
-    throw Error();
+    throw new VisibleError("Insufficient privilege to delete user in group");
   }
   const deleteCommand = new AdminDeleteUserCommand({
     UserPoolId: Resource.UserPool.id,
@@ -35,8 +36,11 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
-  async ({ evt, userGroup }) => {
+  async ({ evt, userGroup, userId }) => {
     const input = schema.parse(evt.body);
+    if (input.id === userId) {
+      throw new Error("Users cannot delete themselves via a lambda call");
+    }
     const allowedToDelete = [Resource.UserGroups.agent];
     if (userGroup === Resource.UserGroups.rootAdmin) {
       allowedToDelete.push(Resource.UserGroups.admin);

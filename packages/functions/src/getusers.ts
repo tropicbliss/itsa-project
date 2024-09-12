@@ -51,16 +51,24 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
-  async ({ userGroup }) => {
+  async ({ userGroup, userId }) => {
     let users: User[] = [];
     const usersInAgentRole = await getUsersInGroup(Resource.UserGroups.agent);
     for (const attribute of usersInAgentRole) {
-      users.push(getUserFromResponse(attribute, Resource.UserGroups.agent));
+      const user = getUserFromResponse(attribute, Resource.UserGroups.agent);
+      if (user.id !== userId) {
+        users.push(user);
+      }
     }
     if (userGroup === Resource.UserGroups.rootAdmin) {
-      const usersInAdminRole = await getUsersInGroup(Resource.UserGroups.admin);
+      const usersInAdminRole = await getUsersInGroup(
+        Resource.UserGroups.rootAdmin
+      );
       for (const attribute of usersInAdminRole) {
-        users.push(getUserFromResponse(attribute, Resource.UserGroups.admin));
+        const user = getUserFromResponse(attribute, Resource.UserGroups.admin);
+        if (user.id !== userId) {
+          users.push(user);
+        }
       }
     }
     return users;
