@@ -101,7 +101,7 @@ api.route(
   "GET /admin/users",
   {
     link: [region, userGroups, userPool],
-    handler: "packages/functions/src/getusers.handler",
+    handler: "packages/functions/src/admin/getusers.handler",
   },
   {
     auth: {
@@ -116,7 +116,7 @@ api.route(
   "DELETE /admin/user",
   {
     link: [region, userGroups, userPool],
-    handler: "packages/functions/src/deleteuser.handler",
+    handler: "packages/functions/src/admin/deleteuser.handler",
   },
   {
     auth: {
@@ -131,7 +131,7 @@ api.route(
   "POST /admin/disableuser",
   {
     link: [region, userGroups, userPool],
-    handler: "packages/functions/src/disableuser.handler",
+    handler: "packages/functions/src/admin/disableuser.handler",
   },
   {
     auth: {
@@ -146,7 +146,7 @@ api.route(
   "POST /admin/user",
   {
     link: [region, userGroups, userPool],
-    handler: "packages/functions/src/createuser.handler",
+    handler: "packages/functions/src/admin/createuser.handler",
   },
   {
     auth: {
@@ -161,7 +161,7 @@ api.route(
   "PUT /admin/user",
   {
     link: [region, userGroups, userPool],
-    handler: "packages/functions/src/updateuser.handler",
+    handler: "packages/functions/src/admin/updateuser.handler",
   },
   {
     auth: {
