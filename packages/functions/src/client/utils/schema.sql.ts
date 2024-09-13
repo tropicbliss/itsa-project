@@ -12,7 +12,7 @@ export const client = pgTable("client", {
   firstName: varchar("first_name", { length: 50 }).notNull(),
   lastName: varchar("last_name", { length: 50 }).notNull(),
   dateOfBirth: date("date_of_birth").notNull(),
-  gender: varchar("gender", { length: 14 }).notNull(),
+  gender: text("gender").notNull(),
   emailAddress: text("email_address").notNull(),
   phoneNumber: varchar("phone_number", { length: 15 }).notNull(),
   address: varchar("address", { length: 100 }).notNull(),
@@ -27,8 +27,8 @@ export const account = pgTable("account", {
   clientId: uuid("client_id")
     .references(() => client.clientId, { onDelete: "cascade" })
     .notNull(),
-  accountType: varchar("account_type", { length: 8 }).notNull(),
-  accountStatus: varchar("account_status", { length: 8 }).notNull(),
+  accountType: text("account_type").notNull(),
+  accountStatus: text("account_status").notNull(),
   openingDate: date("opening_date").notNull(),
   initialDeposit: numeric("initial_deposit", { precision: 15, scale: 2 }),
   currency: text("currency").notNull(),
