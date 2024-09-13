@@ -4,9 +4,10 @@ import { z } from "zod";
 import { db } from "./utils/drizzle";
 import { client } from "./utils/schema.sql";
 import { eq } from "drizzle-orm";
+import { clientIdSchema } from "./utils/validators";
 
 const schema = z.object({
-  id: z.string().uuid(),
+  id: clientIdSchema,
 });
 
 export const handler = Util.handler(
