@@ -32,5 +32,5 @@ export const account = pgTable("account", {
   openingDate: date("opening_date").notNull(),
   initialDeposit: numeric("initial_deposit", { precision: 15, scale: 2 }),
   currency: text("currency").notNull(),
-  branchId: text("branchId").notNull(),
+  branchId: text("branch_id").notNull(),
 });

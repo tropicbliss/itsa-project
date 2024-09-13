@@ -1,0 +1,1 @@
+ALTER TABLE "account" RENAME COLUMN "branchId" TO "branch_id";
