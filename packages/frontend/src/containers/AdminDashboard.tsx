@@ -41,7 +41,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { get } from "@/lib/fetchLib";
+import { del, get } from "@/lib/fetchLib";
 
 const data: Payment[] = [
   {
@@ -175,6 +175,17 @@ export const columns: ColumnDef<Payment>[] = [
 ];
 
 export function DataTableDemo() {
+  return (
+    <Button
+      onClick={async () => {
+        await del("/agent/client", {
+          id: "234",
+        });
+      }}
+    >
+      Send
+    </Button>
+  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

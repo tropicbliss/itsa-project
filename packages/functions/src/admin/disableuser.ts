@@ -37,7 +37,7 @@ export const handler = Util.handler(
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
   async ({ evt, userGroup, userId }) => {
-    const input = schema.parse(evt.body);
+    const input = schema.parse(JSON.parse(evt.body!));
     if (input.id === userId) {
       throw new VisibleError(
         "Users cannot disable themselves via a lambda call"

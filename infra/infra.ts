@@ -10,7 +10,7 @@ export const userPoolClient = userPool.addClient("UserPoolClient");
 
 export const api = new sst.aws.ApiGatewayV2("Api", {
   cors: {
-    allowHeaders: ["Authorization"],
+    allowHeaders: ["Authorization", "Content-Type"],
   },
 });
 
@@ -162,6 +162,21 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/updateuser.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "DELETE /agent/client",
+  {
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/deleteclient.handler",
   },
   {
     auth: {
