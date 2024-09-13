@@ -1,0 +1,1 @@
+ALTER TABLE "account" ALTER COLUMN "initial_deposit" SET NOT NULL;
