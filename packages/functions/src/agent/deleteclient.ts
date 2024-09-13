@@ -11,7 +11,7 @@ const schema = z.object({
 
 export const handler = Util.handler(
   {
-    allowedGroups: [Resource.UserGroups.agent, Resource.UserGroups.rootAdmin],
+    allowedGroups: [Resource.UserGroups.agent],
   },
   async ({ body }) => {
     const input = schema.parse(body);
