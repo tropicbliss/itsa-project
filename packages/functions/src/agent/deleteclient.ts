@@ -6,7 +6,7 @@ import { client } from "./utils/schema.sql";
 import { eq } from "drizzle-orm";
 
 const schema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
 });
 
 export const handler = Util.handler(
