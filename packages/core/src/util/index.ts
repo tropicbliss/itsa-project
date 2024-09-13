@@ -33,13 +33,12 @@ export module Util {
           });
           statusCode = 200;
         } catch (error) {
+          statusCode = 400;
           if (error instanceof VisibleError) {
-            statusCode = 400;
             body = {
               error: error.message,
             };
           } else if (error instanceof ZodError) {
-            statusCode = 400;
             const errors = error.errors.map((err) => ({
               path: err.path.join("."),
               message: err.message,
