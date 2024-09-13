@@ -91,6 +91,12 @@ new aws.cognito.UserInGroup("rootAdminInRootAdminGroup", {
   userPoolId: userPool.id,
 });
 
+const databaseVpc = new sst.aws.Vpc("DatabaseVPC");
+
+const clientDatabase = new sst.aws.Postgres("ClientDatabase", {
+  vpc: databaseVpc,
+});
+
 api.route(
   "GET /admin/users",
   {

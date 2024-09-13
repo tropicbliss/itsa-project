@@ -1,5 +1,6 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VisibleError } from "./visibleError";
+import { ZodError } from "zod";
 
 export type UtilOptions = {
   allowedGroups?: string[];
@@ -36,6 +37,15 @@ export module Util {
             statusCode = 400;
             body = {
               error: error.message,
+            };
+          } else if (error instanceof ZodError) {
+            statusCode = 400;
+            const errors = error.errors.map((err) => ({
+              path: err.path.join("."),
+              message: err.message,
+            }));
+            body = {
+              error: errors,
             };
           } else {
             statusCode = 500;

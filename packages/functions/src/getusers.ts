@@ -61,9 +61,7 @@ export const handler = Util.handler(
       }
     }
     if (userGroup === Resource.UserGroups.rootAdmin) {
-      const usersInAdminRole = await getUsersInGroup(
-        Resource.UserGroups.rootAdmin
-      );
+      const usersInAdminRole = await getUsersInGroup(Resource.UserGroups.admin);
       for (const attribute of usersInAdminRole) {
         const user = getUserFromResponse(attribute, Resource.UserGroups.admin);
         if (user.id === userId) {
