@@ -13,8 +13,8 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.agent, Resource.UserGroups.rootAdmin],
   },
-  async ({ evt }) => {
-    const input = schema.parse(JSON.parse(evt.body!));
+  async ({ body }) => {
+    const input = schema.parse(body);
     await db.delete(client).where(eq(client.clientId, input.id)).execute();
   }
 );

@@ -24,8 +24,8 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
-  async ({ evt, userGroup }) => {
-    const input = schema.parse(JSON.parse(evt.body!));
+  async ({ body, userGroup }) => {
+    const input = schema.parse(body);
     if (userGroup === Resource.UserGroups.admin && input.role === "admin") {
       throw new VisibleError("An admin cannot create another admin user");
     }

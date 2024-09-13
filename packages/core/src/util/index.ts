@@ -7,8 +7,7 @@ export type UtilOptions = {
 };
 
 export type Input = {
-  evt: APIGatewayProxyEvent;
-  context: Context;
+  body: unknown;
   userGroup: string;
   userId: string;
 };
@@ -26,8 +25,7 @@ export module Util {
       if (isAllowed) {
         try {
           body = await lambda({
-            evt: event,
-            context,
+            body: JSON.parse(event.body!),
             userGroup: userInGroup,
             userId: event.requestContext.authorizer!.jwt.claims.username,
           });
