@@ -1,0 +1,2 @@
+ALTER TABLE "client" ADD CONSTRAINT "client_email_address_unique" UNIQUE("email_address");--> statement-breakpoint
+ALTER TABLE "client" ADD CONSTRAINT "client_phone_number_unique" UNIQUE("phone_number");

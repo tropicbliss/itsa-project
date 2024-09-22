@@ -1,5 +1,5 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VisibleError } from "./visibleError";
+import { NotFoundError, VisibleError } from "./visibleError";
 import { ZodError } from "zod";
 
 export type UtilOptions = {
@@ -36,6 +36,9 @@ export module Util {
             body = {
               error: error.message,
             };
+            if (error instanceof NotFoundError) {
+              statusCode = 404;
+            }
           } else if (error instanceof ZodError) {
             const errors = error.errors.map((err) => ({
               path: err.path.join("."),

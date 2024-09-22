@@ -179,7 +179,7 @@ export function DataTableDemo() {
     <Button
       onClick={async () => {
         await del("/agent/client", {
-          id: "234",
+          id: "eb42289b-e0f5-4de4-ac77-26b2fd043733",
         });
       }}
     >

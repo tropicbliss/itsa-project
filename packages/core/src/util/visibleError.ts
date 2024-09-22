@@ -5,3 +5,5 @@ export class VisibleError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
+export class NotFoundError extends VisibleError {}

@@ -187,6 +187,66 @@ api.route(
   }
 );
 
+api.route(
+  "DELETE /agent/account",
+  {
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/deleteaccount.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "POST /agent/account",
+  {
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/createaccount.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "GET /agent/client",
+  {
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/getclient.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "POST /agent/client",
+  {
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/createclient.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
 export const frontend = new sst.aws.StaticSite("Frontend", {
   path: "packages/frontend",
   build: {

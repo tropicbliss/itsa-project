@@ -1,0 +1,1 @@
+ALTER TABLE "client" ALTER COLUMN "country" SET DATA TYPE char(2);
