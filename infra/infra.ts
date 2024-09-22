@@ -247,6 +247,21 @@ api.route(
   }
 );
 
+api.route(
+  "PUT /agent/client",
+  {
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/updateclient.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
 export const frontend = new sst.aws.StaticSite("Frontend", {
   path: "packages/frontend",
   build: {
