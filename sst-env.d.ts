@@ -37,6 +37,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "Uploads": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
     "UserGroups": {
       "admin": string
       "agent": string

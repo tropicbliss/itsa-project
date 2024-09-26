@@ -14,6 +14,8 @@ export const api = new sst.aws.ApiGatewayV2("Api", {
   },
 });
 
+export const bucket = new sst.aws.Bucket("Uploads");
+
 export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   userPools: [
     {
@@ -23,6 +25,15 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   ],
   permissions: {
     authenticated: [
+      {
+        actions: ["s3:*"],
+        resources: [
+          $concat(
+            bucket.arn,
+            "/private/${cognito-identity.amazonaws.com:sub}/*"
+          ),
+        ],
+      },
       {
         actions: ["execute-api:*"],
         resources: [

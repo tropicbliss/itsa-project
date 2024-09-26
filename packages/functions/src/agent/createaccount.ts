@@ -3,7 +3,15 @@ import { Resource } from "sst";
 import { z } from "zod";
 import { db } from "./utils/drizzle";
 import { account } from "./utils/schema.sql";
-import { accountStatusSchema, accountTypeSchema, branchIdSchema, clientIdSchema, currencySchema, initialDepositSchema, openingDateSchema } from "./utils/validators";
+import {
+  accountStatusSchema,
+  accountTypeSchema,
+  branchIdSchema,
+  clientIdSchema,
+  currencySchema,
+  initialDepositSchema,
+  openingDateSchema,
+} from "./utils/validators";
 
 const schema = z.object({
   clientId: clientIdSchema,
@@ -12,7 +20,7 @@ const schema = z.object({
   openingDate: openingDateSchema,
   initialDeposit: initialDepositSchema,
   currency: currencySchema,
-  branchId: branchIdSchema
+  branchId: branchIdSchema,
 });
 
 export const handler = Util.handler(
@@ -22,7 +30,7 @@ export const handler = Util.handler(
   async ({ body }) => {
     const input = schema.parse(body);
     await db.insert(account).values({
-      ...input
-    })
+      ...input,
+    });
   }
 );
