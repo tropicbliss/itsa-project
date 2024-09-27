@@ -57,6 +57,20 @@
       "when": 1726997061244,
       "tag": "0007_condemned_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1727436960911,
+      "tag": "0008_absent_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1727437190498,
+      "tag": "0009_stormy_stryfe",
+      "breakpoints": true
     }
   ]
 }

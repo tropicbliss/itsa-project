@@ -26,15 +26,6 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   permissions: {
     authenticated: [
       {
-        actions: ["s3:*"],
-        resources: [
-          $concat(
-            bucket.arn,
-            "/private/${cognito-identity.amazonaws.com:sub}/*"
-          ),
-        ],
-      },
-      {
         actions: ["execute-api:*"],
         resources: [
           $concat(
@@ -263,6 +254,21 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/updateclient.handler",
+  },
+  {
+    auth: {
+      jwt: {
+        authorizer: authorizer.id,
+      },
+    },
+  }
+);
+
+api.route(
+  "POST /agent/verifyclient",
+  {
+    link: [userGroups, clientDatabase, bucket],
+    handler: "packages/functions/src/agent/verifyclient.handler",
   },
   {
     auth: {

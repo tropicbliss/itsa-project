@@ -6,6 +6,7 @@ import {
   varchar,
   numeric,
   char,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export const client = pgTable("client", {
@@ -21,6 +22,7 @@ export const client = pgTable("client", {
   state: varchar("state", { length: 50 }).notNull(),
   countryCode: char("country", { length: 2 }).notNull(),
   postalCode: varchar("postal_code", { length: 10 }).notNull(),
+  isVerified: boolean("is_verified").default(false),
 });
 
 export const account = pgTable("account", {
