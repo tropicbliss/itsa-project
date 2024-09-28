@@ -71,6 +71,13 @@
       "when": 1727437190498,
       "tag": "0009_stormy_stryfe",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1727492932956,
+      "tag": "0010_quick_wiccan",
+      "breakpoints": true
     }
   ]
 }

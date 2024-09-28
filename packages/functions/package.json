@@ -6,6 +6,7 @@
     "@aws-sdk/client-rds-data": "^3.650.0",
     "@aws-sdk/client-s3": "^3.658.1",
     "@aws-sdk/client-sesv2": "^3.645.0",
+    "@aws-sdk/s3-request-presigner": "^3.658.1",
     "@itsa-project/core": "*",
     "sst": "*",
     "validator": "^13.12.0"

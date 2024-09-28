@@ -22,7 +22,6 @@ export const client = pgTable("client", {
   state: varchar("state", { length: 50 }).notNull(),
   countryCode: char("country", { length: 2 }).notNull(),
   postalCode: varchar("postal_code", { length: 10 }).notNull(),
-  isVerified: boolean("is_verified").default(false),
   agentId: uuid("agent_id").notNull(),
 });
 

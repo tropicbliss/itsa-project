@@ -7,19 +7,20 @@ import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./utils/validators";
 import { NotFoundError } from "@itsa-project/core/util/visibleError";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { PassThrough } from "stream";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3Client = new S3Client({ region: Resource.Region.name });
 
 const schema = z.object({
   clientId: clientIdSchema,
+  contentType: z.enum(["image/jpeg", "application/pdf", "image/png"]),
 });
 
 export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.agent],
   },
-  async ({ body, event, userId }) => {
+  async ({ body, userId }) => {
     const input = schema.parse(body);
     const clientExists = await db
       .select()
@@ -32,25 +33,14 @@ export const handler = Util.handler(
     if (!clientExists) {
       throw new NotFoundError("Client id not found");
     }
-    const fileContent = Buffer.from(event.body!, "base64");
-    const fileStream = new PassThrough();
-    fileStream.end(fileContent);
-    const key = `/verifyClient/${input.clientId}`;
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: Resource.Uploads.name,
-        Key: key,
-        Body: fileStream,
-      })
-    );
-    await db
-      .update(client)
-      .set({
-        isVerified: true,
-      })
-      .where(eq(client.clientId, input.clientId));
-    return {
-      url: `https://${Resource.Uploads.name}.s3.amazonaws.com/${key}`,
-    };
+    const command = new PutObjectCommand({
+      Bucket: Resource.Uploads.name,
+      Key: `/verifyClient/${input.clientId}`,
+      ContentType: input.contentType,
+    });
+    const url = await getSignedUrl(s3Client, command, {
+      expiresIn: 600,
+    });
+    return { url };
   }
 );
