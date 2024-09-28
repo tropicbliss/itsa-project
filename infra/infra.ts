@@ -14,7 +14,46 @@ export const api = new sst.aws.ApiGatewayV2("Api", {
   },
 });
 
-export const bucket = new sst.aws.Bucket("Uploads");
+export const bucket = new sst.aws.Bucket("Uploads", {
+  public: true,
+  transform: {
+    policy: (args) => {
+      args.policy = $jsonParse(args.policy as any).apply((policy) => {
+        policy.Statement.push({
+          Sid: "DenyNonPresignedRequests",
+          Effect: "Deny",
+          Principal: "*",
+          Action: "s3:PutObject",
+          Resource: $interpolate`arn:aws:s3:::${args.bucket}/*`,
+          Condition: {
+            StringNotEquals: {
+              "s3:x-amz-server-side-encryption": "aws:kms",
+            },
+            Bool: {
+              "aws:SecureTransport": "false",
+            },
+          },
+        });
+        policy.Statement.push({
+          Sid: "AllowPresignedUrlUploadsOnly",
+          Effect: "Allow",
+          Principal: "*",
+          Action: "s3:PutObject",
+          Resource: $interpolate`arn:aws:s3:::${args.bucket}/*`,
+          Condition: {
+            Bool: {
+              "aws:SecureTransport": "true",
+            },
+            StringEquals: {
+              "s3:signatureversion": "AWS4-HMAC-SHA256",
+            },
+          },
+        });
+        return $jsonStringify(policy);
+      });
+    },
+  },
+});
 
 export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   userPools: [
@@ -25,15 +64,6 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   ],
   permissions: {
     authenticated: [
-      {
-        actions: ["s3:*"],
-        resources: [
-          $concat(
-            bucket.arn,
-            "/private/${cognito-identity.amazonaws.com:sub}/*"
-          ),
-        ],
-      },
       {
         actions: ["execute-api:*"],
         resources: [
@@ -108,19 +138,21 @@ const clientDatabase = new sst.aws.Postgres("ClientDatabase", {
   vpc: databaseVpc,
 });
 
+const routeMetadata = {
+  auth: {
+    jwt: {
+      authorizer: authorizer.id,
+    },
+  },
+};
+
 api.route(
   "GET /admin/users",
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/getusers.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -129,13 +161,7 @@ api.route(
     link: [region, userGroups, userPool, clientDatabase],
     handler: "packages/functions/src/admin/deleteuser.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -144,13 +170,7 @@ api.route(
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/disableuser.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -159,13 +179,7 @@ api.route(
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/createuser.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -174,13 +188,7 @@ api.route(
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/updateuser.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -189,13 +197,7 @@ api.route(
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/deleteclient.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -204,13 +206,7 @@ api.route(
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/deleteaccount.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -219,13 +215,7 @@ api.route(
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/createaccount.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -234,13 +224,7 @@ api.route(
     link: [userGroups, clientDatabase, bucket],
     handler: "packages/functions/src/agent/getclient.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -249,13 +233,7 @@ api.route(
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/createclient.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -264,13 +242,7 @@ api.route(
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/updateclient.handler",
   },
-  {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+  routeMetadata
 );
 
 api.route(
@@ -279,13 +251,16 @@ api.route(
     link: [userGroups, clientDatabase, bucket],
     handler: "packages/functions/src/agent/verifyclient.handler",
   },
+  routeMetadata
+);
+
+api.route(
+  "GET /agent/accounts",
   {
-    auth: {
-      jwt: {
-        authorizer: authorizer.id,
-      },
-    },
-  }
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/getaccounts.handler",
+  },
+  routeMetadata
 );
 
 export const frontend = new sst.aws.StaticSite("Frontend", {
