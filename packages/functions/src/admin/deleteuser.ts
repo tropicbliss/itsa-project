@@ -7,12 +7,15 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { z } from "zod";
 import { VisibleError } from "@itsa-project/core/util/visibleError";
+import { db } from "../agent/utils/drizzle";
+import { client } from "../agent/utils/schema.sql";
+import { eq } from "drizzle-orm";
 
 const schema = z.object({
-  id: z.string().min(1),
+  id: z.string().uuid(),
 });
 
-const client = new CognitoIdentityProviderClient({
+const cognitoClient = new CognitoIdentityProviderClient({
   region: Resource.Region.name,
 });
 
@@ -21,7 +24,7 @@ async function deleteUser(id: string, targetGroups: string[]) {
     Username: id,
     UserPoolId: Resource.UserPool.id,
   });
-  const response = await client.send(checkCommand);
+  const response = await cognitoClient.send(checkCommand);
   if (!targetGroups.includes(response.Groups![0].GroupName!)) {
     throw new VisibleError("Insufficient privilege to delete user in group");
   }
@@ -29,24 +32,23 @@ async function deleteUser(id: string, targetGroups: string[]) {
     UserPoolId: Resource.UserPool.id,
     Username: id,
   });
-  await client.send(deleteCommand);
+  await cognitoClient.send(deleteCommand);
+  return response.Groups![0].GroupName!;
 }
 
 export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
-  async ({ body, userGroup, userId }) => {
+  async ({ body, userGroup }) => {
     const input = schema.parse(body);
-    if (input.id === userId) {
-      throw new VisibleError(
-        "Users cannot delete themselves via a lambda call"
-      );
-    }
     const allowedToDelete = [Resource.UserGroups.agent];
     if (userGroup === Resource.UserGroups.rootAdmin) {
       allowedToDelete.push(Resource.UserGroups.admin);
     }
-    await deleteUser(input.id, allowedToDelete);
+    const groupDeleted = await deleteUser(input.id, allowedToDelete);
+    if (groupDeleted === Resource.UserGroups.agent) {
+      await db.delete(client).where(eq(client.agentId, input.id));
+    }
   }
 );

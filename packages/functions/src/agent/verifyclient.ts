@@ -3,7 +3,7 @@ import { Resource } from "sst";
 import { z } from "zod";
 import { db } from "./utils/drizzle";
 import { client } from "./utils/schema.sql";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./utils/validators";
 import { NotFoundError } from "@itsa-project/core/util/visibleError";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -19,12 +19,14 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.agent],
   },
-  async ({ body, event }) => {
+  async ({ body, event, userId }) => {
     const input = schema.parse(body);
     const clientExists = await db
       .select()
       .from(client)
-      .where(eq(client.clientId, input.clientId))
+      .where(
+        and(eq(client.clientId, input.clientId), eq(client.agentId, userId))
+      )
       .limit(1)
       .then((result) => result.length > 0);
     if (!clientExists) {

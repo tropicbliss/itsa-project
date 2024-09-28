@@ -37,10 +37,11 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.agent],
   },
-  async ({ body }) => {
+  async ({ body, userId }) => {
     const input = schema.parse(body);
     await db.insert(client).values({
       ...input,
+      agentId: userId,
     });
   }
 );

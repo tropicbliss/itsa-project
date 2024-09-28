@@ -9,7 +9,7 @@ import { z } from "zod";
 import { VisibleError } from "@itsa-project/core/util/visibleError";
 
 const schema = z.object({
-  id: z.string().min(1),
+  id: z.string().uuid(),
 });
 
 const client = new CognitoIdentityProviderClient({
@@ -36,13 +36,8 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
-  async ({ body, userGroup, userId }) => {
+  async ({ body, userGroup }) => {
     const input = schema.parse(body);
-    if (input.id === userId) {
-      throw new VisibleError(
-        "Users cannot disable themselves via a lambda call"
-      );
-    }
     const allowedToDisable = [Resource.UserGroups.agent];
     if (userGroup === Resource.UserGroups.rootAdmin) {
       allowedToDisable.push(Resource.UserGroups.admin);

@@ -23,6 +23,7 @@ export const client = pgTable("client", {
   countryCode: char("country", { length: 2 }).notNull(),
   postalCode: varchar("postal_code", { length: 10 }).notNull(),
   isVerified: boolean("is_verified").default(false),
+  agentId: uuid("agent_id").notNull(),
 });
 
 export const account = pgTable("account", {

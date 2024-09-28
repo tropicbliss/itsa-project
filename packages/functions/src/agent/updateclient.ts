@@ -17,7 +17,7 @@ import {
   phoneNumberSchema,
   stateSchema,
 } from "./utils/validators";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 const schema = z
   .object({
@@ -48,13 +48,15 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.agent],
   },
-  async ({ body }) => {
+  async ({ body, userId }) => {
     const input = schema.parse(body);
     await db
       .update(client)
       .set({
         ...input,
       })
-      .where(eq(client.clientId, input.clientId));
+      .where(
+        and(eq(client.clientId, input.clientId), eq(client.agentId, userId))
+      );
   }
 );

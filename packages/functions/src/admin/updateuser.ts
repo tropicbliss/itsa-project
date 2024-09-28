@@ -9,7 +9,7 @@ import { z } from "zod";
 import { VisibleError } from "@itsa-project/core/util/visibleError";
 
 const schema = z.object({
-  id: z.string().min(1),
+  id: z.string().uuid(),
   email: z.string().email(),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
@@ -59,13 +59,8 @@ export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.admin, Resource.UserGroups.rootAdmin],
   },
-  async ({ body, userGroup, userId }) => {
+  async ({ body, userGroup }) => {
     const input = schema.parse(body);
-    if (input.id === userId) {
-      throw new VisibleError(
-        "Users cannot update themselves via a lambda call"
-      );
-    }
     const allowedToUpdate = [Resource.UserGroups.agent];
     if (userGroup === Resource.UserGroups.rootAdmin) {
       allowedToUpdate.push(Resource.UserGroups.admin);

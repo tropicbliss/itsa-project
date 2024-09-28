@@ -117,7 +117,7 @@ api.route(
 api.route(
   "DELETE /admin/user",
   {
-    link: [region, userGroups, userPool],
+    link: [region, userGroups, userPool, clientDatabase],
     handler: "packages/functions/src/admin/deleteuser.handler",
   },
   {
