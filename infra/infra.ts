@@ -14,7 +14,10 @@ export const api = new sst.aws.ApiGatewayV2("Api", {
   },
 });
 
-export const bucket = new sst.aws.Bucket("Uploads");
+export const bucket = new sst.aws.Bucket("Uploads", {
+  public: false,
+  cors: false,
+});
 
 export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   userPools: [
