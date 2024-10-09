@@ -42,6 +42,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "Transactions": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
     "Uploads": {
       "name": string
       "type": "sst.aws.Bucket"

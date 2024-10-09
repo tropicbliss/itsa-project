@@ -6,6 +6,15 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
 });
 
+export const transactionDB = new sst.aws.Dynamo("Transactions", {
+  fields: {
+    id: "string",
+  },
+  primaryIndex: {
+    hashKey: "id",
+  },
+});
+
 export const userPoolClient = userPool.addClient("UserPoolClient");
 
 export const api = new sst.aws.ApiGatewayV2("Api", {
