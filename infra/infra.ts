@@ -14,46 +14,7 @@ export const api = new sst.aws.ApiGatewayV2("Api", {
   },
 });
 
-export const bucket = new sst.aws.Bucket("Uploads", {
-  public: true,
-  transform: {
-    policy: (args) => {
-      args.policy = $jsonParse(args.policy as any).apply((policy) => {
-        policy.Statement.push({
-          Sid: "DenyNonPresignedRequests",
-          Effect: "Deny",
-          Principal: "*",
-          Action: "s3:PutObject",
-          Resource: $interpolate`arn:aws:s3:::${args.bucket}/*`,
-          Condition: {
-            StringNotEquals: {
-              "s3:x-amz-server-side-encryption": "aws:kms",
-            },
-            Bool: {
-              "aws:SecureTransport": "false",
-            },
-          },
-        });
-        policy.Statement.push({
-          Sid: "AllowPresignedUrlUploadsOnly",
-          Effect: "Allow",
-          Principal: "*",
-          Action: "s3:PutObject",
-          Resource: $interpolate`arn:aws:s3:::${args.bucket}/*`,
-          Condition: {
-            Bool: {
-              "aws:SecureTransport": "true",
-            },
-            StringEquals: {
-              "s3:signatureversion": "AWS4-HMAC-SHA256",
-            },
-          },
-        });
-        return $jsonStringify(policy);
-      });
-    },
-  },
-});
+export const bucket = new sst.aws.Bucket("Uploads");
 
 export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   userPools: [
