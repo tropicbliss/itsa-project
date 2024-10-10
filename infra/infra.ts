@@ -4,6 +4,8 @@ export const region = new sst.Linkable("Region", {
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
+  mfa: "on",
+  softwareToken: true,
 });
 
 export const transactionDB = new sst.aws.Dynamo("Transactions", {
