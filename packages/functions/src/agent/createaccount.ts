@@ -4,7 +4,6 @@ import { z } from "zod";
 import { db } from "./utils/drizzle";
 import { account, client } from "./utils/schema.sql";
 import {
-  accountStatusSchema,
   accountTypeSchema,
   branchIdSchema,
   clientIdSchema,
@@ -18,7 +17,6 @@ import { VisibleError } from "@itsa-project/core/util/visibleError";
 const schema = z.object({
   clientId: clientIdSchema,
   accountType: accountTypeSchema,
-  accountStatus: accountStatusSchema,
   openingDate: openingDateSchema,
   initialDeposit: initialDepositSchema,
   currency: currencySchema,
@@ -38,14 +36,19 @@ export const handler = Util.handler(
         and(eq(client.clientId, input.clientId), eq(client.agentId, userId))
       )
       .limit(1)
+      .execute()
       .then((row) => row.length > 0);
     if (!isUserAllowedToModifyClient) {
       throw new VisibleError(
         "User does not have permission to modify this client"
       );
     }
-    await db.insert(account).values({
-      ...input,
-    });
+    await db
+      .insert(account)
+      .values({
+        ...input,
+        accountStatus: "active",
+      })
+      .execute();
   }
 );

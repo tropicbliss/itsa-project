@@ -36,6 +36,7 @@ function getUserFromResponse(user: UserType, role: string): User {
     id: user.Username!,
     lastName: extractValueInAttribute(attribute, "family_name"),
     role: role.split("-")[0],
+    isEnabled: user.Enabled!,
   };
 }
 
@@ -45,6 +46,7 @@ type User = {
   firstName: string;
   lastName: string;
   role: string;
+  isEnabled: boolean;
 };
 
 export const handler = Util.handler(

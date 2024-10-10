@@ -6,7 +6,9 @@ import {
   varchar,
   numeric,
   char,
-  boolean,
+  timestamp,
+  jsonb,
+  serial,
 } from "drizzle-orm/pg-core";
 
 export const client = pgTable("client", {
@@ -39,4 +41,11 @@ export const account = pgTable("account", {
   }).notNull(),
   currency: char("currency", { length: 3 }).notNull(),
   branchId: text("branch_id").notNull(),
+});
+
+export const archive = pgTable("archive", {
+  id: serial("id").primaryKey(),
+  deletedAt: timestamp("deleted_at").defaultNow().notNull(),
+  table: text("table_name").notNull(),
+  data: jsonb("data").notNull(),
 });

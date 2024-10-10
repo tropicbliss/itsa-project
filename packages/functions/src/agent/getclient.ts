@@ -2,7 +2,7 @@ import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
 import { db } from "./utils/drizzle";
-import { client } from "./utils/schema.sql";
+import { account, client } from "./utils/schema.sql";
 import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./utils/validators";
 import { NotFoundError } from "@itsa-project/core/util/visibleError";
@@ -20,12 +20,15 @@ export const handler = Util.handler(
   },
   async ({ body, userId }) => {
     const input = schema.parse(body);
-    const [row, isVerified] = await Promise.all([
+    const [clientRow, accounts, isVerified] = await Promise.all([
       db
         .select()
         .from(client)
         .where(and(eq(client.clientId, input.id), eq(client.agentId, userId)))
+        .limit(1)
+        .execute()
         .then((result) => result[0]),
+      db.select().from(account).where(eq(account.clientId, input.id)).execute(),
       s3Client
         .send(
           new HeadObjectCommand({
@@ -42,9 +45,9 @@ export const handler = Util.handler(
           }
         }),
     ]);
-    if (row === undefined) {
+    if (clientRow === undefined) {
       throw new NotFoundError("Client id not found");
     }
-    return { ...row, isVerified };
+    return { isVerified, accounts, client: clientRow };
   }
 );

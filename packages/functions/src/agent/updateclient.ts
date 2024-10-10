@@ -57,6 +57,7 @@ export const handler = Util.handler(
       })
       .where(
         and(eq(client.clientId, input.clientId), eq(client.agentId, userId))
-      );
+      )
+      .execute();
   }
 );

@@ -22,6 +22,7 @@ export const handler = Util.handler(
       .from(client)
       .where(and(eq(client.clientId, input.id), eq(client.agentId, userId)))
       .limit(1)
+      .execute()
       .then((row) => row.length > 0);
     if (!isUserAllowedToModifyClient) {
       throw new VisibleError(

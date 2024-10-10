@@ -29,6 +29,7 @@ export const handler = Util.handler(
         and(eq(client.clientId, input.clientId), eq(client.agentId, userId))
       )
       .limit(1)
+      .execute()
       .then((result) => result.length > 0);
     if (!clientExists) {
       throw new NotFoundError("Client id not found");

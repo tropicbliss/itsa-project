@@ -16,6 +16,8 @@ import {
   phoneNumberSchema,
   stateSchema,
 } from "./utils/validators";
+import { eq } from "drizzle-orm";
+import { VisibleError } from "@itsa-project/core/util/visibleError";
 
 const schema = z
   .object({
@@ -38,10 +40,23 @@ export const handler = Util.handler(
     allowedGroups: [Resource.UserGroups.agent],
   },
   async ({ body, userId }) => {
+    const hasPreexistingClients = await db
+      .select()
+      .from(client)
+      .where(eq(client.agentId, userId))
+      .limit(1)
+      .execute()
+      .then((row) => row.length > 0);
+    if (hasPreexistingClients) {
+      throw new VisibleError("An agent can only be responsible for one client");
+    }
     const input = schema.parse(body);
-    await db.insert(client).values({
-      ...input,
-      agentId: userId,
-    });
+    await db
+      .insert(client)
+      .values({
+        ...input,
+        agentId: userId,
+      })
+      .execute();
   }
 );
