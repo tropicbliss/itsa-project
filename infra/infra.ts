@@ -17,6 +17,20 @@ export const transactionDB = new sst.aws.Dynamo("Transactions", {
   },
 });
 
+export const loggingDB = new sst.aws.Dynamo("Logs", {
+  fields: {
+    id: "string",
+  },
+  primaryIndex: {
+    hashKey: "id",
+  },
+});
+
+export const logger = new sst.aws.Function("Logger", {
+  handler: "packages/functions/src/logger/logger.handler",
+  link: [loggingDB],
+});
+
 export const userPoolClient = userPool.addClient("UserPoolClient");
 
 export const api = new sst.aws.ApiGatewayV2("Api", {

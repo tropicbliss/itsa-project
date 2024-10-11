@@ -13,7 +13,7 @@ export type Input = {
   event: APIGatewayProxyEvent;
 };
 
-export module Util {
+export namespace Util {
   export function handler(
     options: UtilOptions,
     lambda: (input: Input) => Promise<object | void>

@@ -30,6 +30,14 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
+    "Logger": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "Logs": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
     "Region": {
       "name": string
       "type": "sst.sst.Linkable"
