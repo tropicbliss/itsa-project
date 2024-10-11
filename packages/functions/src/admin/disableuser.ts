@@ -6,7 +6,7 @@ import {
   AdminDisableUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { z } from "zod";
-import { VisibleError } from "@itsa-project/core/util/visibleError";
+import { VisibleError } from "@itsa-project/core/errors/visibleError";
 
 const schema = z.object({
   id: z.string().uuid(),

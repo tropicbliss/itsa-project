@@ -6,10 +6,10 @@ import {
   AdminListGroupsForUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { z } from "zod";
-import { VisibleError } from "@itsa-project/core/util/visibleError";
-import { db } from "../agent/utils/drizzle";
-import { client } from "../agent/utils/schema.sql";
+import { db } from "../database/drizzle";
+import { client } from "../database/schema.sql";
 import { eq } from "drizzle-orm";
+import { VisibleError } from "@itsa-project/core/errors/visibleError";
 
 const schema = z.object({
   id: z.string().uuid(),

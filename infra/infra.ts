@@ -8,67 +8,6 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   softwareToken: true,
 });
 
-export const transactionDB = new sst.aws.Dynamo("Transactions", {
-  fields: {
-    id: "string",
-  },
-  primaryIndex: {
-    hashKey: "id",
-  },
-});
-
-export const loggingDB = new sst.aws.Dynamo("Logs", {
-  fields: {
-    id: "string",
-  },
-  primaryIndex: {
-    hashKey: "id",
-  },
-});
-
-export const loggingDLQDB = new sst.aws.Dynamo("LogsDLQDB", {
-  fields: {
-    id: "string",
-  },
-  primaryIndex: {
-    hashKey: "id",
-  },
-});
-
-export const dlq = new sst.aws.Queue("LoggingDLQ");
-
-dlq.subscribe(
-  {
-    handler: "packages/functions/src/logger/logger.dlq",
-    link: [loggingDLQDB],
-  },
-  {
-    batch: {
-      partialResponses: false,
-      size: 25,
-      window: "20 seconds",
-    },
-  }
-);
-
-export const queue = new sst.aws.Queue("LoggingQueue", {
-  dlq: dlq.arn,
-});
-
-queue.subscribe(
-  {
-    handler: "packages/functions/src/logger/logger.main",
-    link: [loggingDB],
-  },
-  {
-    batch: {
-      partialResponses: true,
-      size: 25,
-      window: "20 seconds",
-    },
-  }
-);
-
 export const userPoolClient = userPool.addClient("UserPoolClient");
 
 export const api = new sst.aws.ApiGatewayV2("Api", {
@@ -156,10 +95,10 @@ new aws.cognito.UserInGroup("rootAdminInRootAdminGroup", {
   userPoolId: userPool.id,
 });
 
-const databaseVpc = new sst.aws.Vpc("DatabaseVPC");
+export const clientDatabaseVpc = new sst.aws.Vpc("DatabaseVPC");
 
-const clientDatabase = new sst.aws.Postgres("ClientDatabase", {
-  vpc: databaseVpc,
+export const clientDatabase = new sst.aws.Postgres("ClientDatabase", {
+  vpc: clientDatabaseVpc,
 });
 
 const routeMetadata = {

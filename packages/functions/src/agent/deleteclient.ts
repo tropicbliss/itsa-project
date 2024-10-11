@@ -1,10 +1,10 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
-import { db } from "./utils/drizzle";
-import { client } from "./utils/schema.sql";
+import { db } from "../database/drizzle";
+import { client } from "../database/schema.sql";
 import { eq, and } from "drizzle-orm";
-import { clientIdSchema } from "./utils/validators";
+import { clientIdSchema } from "../database/validators";
 
 const schema = z.object({
   id: clientIdSchema,

@@ -31,7 +31,7 @@ export const client = pgTable(
   },
   (table) => {
     return {
-      agentIdIdx: index("agent_id_idx").on(table.agentId),
+      agentIdIdx: index("agentId_idx").on(table.agentId),
     };
   }
 );
@@ -55,7 +55,7 @@ export const account = pgTable(
   },
   (table) => {
     return {
-      clientIdIdx: index("client_id_idx").on(table.clientId),
+      clientIdIdx: index("clientId_idx").on(table.clientId),
     };
   }
 );
@@ -70,7 +70,31 @@ export const archive = pgTable(
   },
   (table) => {
     return {
-      deletedAtIndex: index("deleted_at_idx").on(table.deletedAt.desc()),
+      deletedAtIndex: index("deletedAt_idx").on(table.deletedAt.desc()),
+    };
+  }
+);
+
+export const transactions = pgTable(
+  "transactions",
+  {
+    transactionId: uuid("transaction_id").primaryKey(),
+    accountId: uuid("account_id").notNull(),
+    transaction: char("transaction", { length: 1 }),
+    amount: numeric("amount", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    insertedAt: timestamp("inserted_at").defaultNow().notNull(),
+    date: date("date").notNull(),
+    status: text("status").notNull(),
+  },
+  (table) => {
+    return {
+      account_insertedAtIndex: index("account_insertedAt_idx").on(
+        table.accountId,
+        table.insertedAt.desc()
+      ),
     };
   }
 );

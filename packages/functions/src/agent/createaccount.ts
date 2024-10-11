@@ -1,8 +1,8 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
-import { db } from "./utils/drizzle";
-import { account, client } from "./utils/schema.sql";
+import { db } from "../database/drizzle";
+import { account, client } from "../database/schema.sql";
 import {
   accountTypeSchema,
   branchIdSchema,
@@ -10,9 +10,9 @@ import {
   currencySchema,
   initialDepositSchema,
   openingDateSchema,
-} from "./utils/validators";
+} from "../database/validators";
 import { and, eq } from "drizzle-orm";
-import { VisibleError } from "@itsa-project/core/util/visibleError";
+import { VisibleError } from "@itsa-project/core/errors/visibleError";
 
 const schema = z.object({
   clientId: clientIdSchema,

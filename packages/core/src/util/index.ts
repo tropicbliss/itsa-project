@@ -1,5 +1,5 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { NotFoundError, VisibleError } from "./visibleError";
+import { NotFoundError, VisibleError } from "../errors/visibleError";
 import { ZodError } from "zod";
 
 export type UtilOptions = {
@@ -10,7 +10,6 @@ export type Input = {
   body: unknown;
   userGroup: string;
   userId: string;
-  event: APIGatewayProxyEvent;
 };
 
 export namespace Util {
@@ -29,7 +28,6 @@ export namespace Util {
             body: JSON.parse(event.body!),
             userGroup: userInGroup,
             userId: event.requestContext.authorizer!.jwt.claims.username,
-            event,
           });
           statusCode = 200;
         } catch (error) {

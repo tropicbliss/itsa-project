@@ -1,8 +1,8 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
-import { db } from "./utils/drizzle";
-import { client } from "./utils/schema.sql";
+import { db } from "../database/drizzle";
+import { client } from "../database/schema.sql";
 import {
   addressSchema,
   citySchema,
@@ -16,7 +16,7 @@ import {
   lastNameSchema,
   phoneNumberSchema,
   stateSchema,
-} from "./utils/validators";
+} from "../database/validators";
 import { eq, and } from "drizzle-orm";
 
 const schema = z

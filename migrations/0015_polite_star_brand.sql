@@ -1,0 +1,1 @@
+ALTER TABLE "transactions" RENAME COLUMN "client_id" TO "account_id";

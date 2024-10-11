@@ -1,7 +1,7 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
-import { db } from "./utils/drizzle";
-import { account, client } from "./utils/schema.sql";
+import { db } from "../database/drizzle";
+import { account, client } from "../database/schema.sql";
 import { eq, and } from "drizzle-orm";
 
 export const handler = Util.handler(

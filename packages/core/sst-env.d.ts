@@ -30,22 +30,6 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
-    "LoggingDLQ": {
-      "type": "sst.aws.Queue"
-      "url": string
-    }
-    "LoggingQueue": {
-      "type": "sst.aws.Queue"
-      "url": string
-    }
-    "Logs": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
-    "LogsDLQDB": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
     "Region": {
       "name": string
       "type": "sst.sst.Linkable"
@@ -57,10 +41,6 @@ declare module "sst" {
     "RootUserPassword": {
       "type": "sst.sst.Secret"
       "value": string
-    }
-    "Transactions": {
-      "name": string
-      "type": "sst.aws.Dynamo"
     }
     "Uploads": {
       "name": string

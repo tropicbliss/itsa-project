@@ -6,8 +6,8 @@ import {
   AdminAddUserToGroupCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { z } from "zod";
-import { VisibleError } from "@itsa-project/core/util/visibleError";
 import { randomUUID } from "crypto";
+import { VisibleError } from "@itsa-project/core/errors/visibleError";
 
 const schema = z.object({
   email: z.string().email(),
