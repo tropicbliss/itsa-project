@@ -46,6 +46,10 @@ export const handler = Util.handler(
           Name: "family_name",
           Value: input.lastName,
         },
+        {
+          Name: "email_verified",
+          Value: "true",
+        },
       ],
     });
     await client.send(createUserCommand);

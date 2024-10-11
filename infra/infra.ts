@@ -4,33 +4,21 @@ export const region = new sst.Linkable("Region", {
 
 const rootUserEmail = new sst.Secret("RootUserEmail");
 
-const logGroup = new aws.cloudwatch.LogGroup("LogGroup", {
-  name: "main",
+const lambdaLogGroup = new aws.cloudwatch.LogGroup("LambdaLogGroup", {
+  name: "lambda",
   retentionInDays: 0,
 });
 
-const sesConfigSet = new aws.ses.ConfigurationSet("SESConfigurationSet");
-
-new aws.ses.EventDestination("SESEventDestination", {
-  configurationSetName: sesConfigSet.name,
-  matchingTypes: ["send"],
-  enabled: true,
-  cloudwatchDestinations: [
-    {
-      defaultValue: logGroup.name,
-      dimensionName: "email",
-      valueSource: "emailHeader",
-    },
-  ],
-});
+const communicationLogGroup = new aws.cloudwatch.LogGroup(
+  "CommunicationLogGroup",
+  {
+    name: "communication",
+    retentionInDays: 0,
+  }
+);
 
 export const email = new sst.aws.Email("Email", {
   sender: rootUserEmail.value,
-  transform: {
-    identity: {
-      configurationSetName: sesConfigSet.name,
-    },
-  },
 });
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
@@ -199,6 +187,10 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/createuser.handler",
+    logging: {
+      format: "json",
+      logGroup: communicationLogGroup.name,
+    },
   },
   routeMetadata
 );
@@ -219,7 +211,7 @@ api.route(
     handler: "packages/functions/src/agent/deleteclient.handler",
     logging: {
       format: "json",
-      logGroup: logGroup.name,
+      logGroup: lambdaLogGroup.name,
     },
   },
   routeMetadata
@@ -250,7 +242,7 @@ api.route(
     handler: "packages/functions/src/agent/getclient.handler",
     logging: {
       format: "json",
-      logGroup: logGroup.name,
+      logGroup: lambdaLogGroup.name,
     },
   },
   routeMetadata
@@ -263,7 +255,7 @@ api.route(
     handler: "packages/functions/src/agent/createclient.handler",
     logging: {
       format: "json",
-      logGroup: logGroup.name,
+      logGroup: lambdaLogGroup.name,
     },
   },
   routeMetadata
@@ -276,7 +268,7 @@ api.route(
     handler: "packages/functions/src/agent/updateclient.handler",
     logging: {
       format: "json",
-      logGroup: logGroup.name,
+      logGroup: lambdaLogGroup.name,
     },
   },
   routeMetadata

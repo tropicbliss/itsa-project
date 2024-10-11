@@ -28,6 +28,16 @@ export namespace Log {
       ...data,
     });
   }
+
+  export function createUser(email: string) {
+    console.log(
+      JSON.stringify({
+        type: "email",
+        status: "sent",
+        recipient: email,
+      })
+    );
+  }
 }
 
 type Common = {
