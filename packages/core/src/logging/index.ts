@@ -29,12 +29,14 @@ export namespace Log {
     });
   }
 
-  export function createUser(email: string) {
+  export function sendEmail(data: {
+    recipient: string;
+    status: "sent" | "failed";
+  }) {
     console.log(
       JSON.stringify({
         type: "email",
-        status: "sent",
-        recipient: email,
+        ...data,
       })
     );
   }

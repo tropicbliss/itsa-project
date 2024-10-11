@@ -25,15 +25,15 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
   mfa: "on",
   softwareToken: true,
-  transform: {
-    userPool: {
-      emailConfiguration: {
-        emailSendingAccount: "DEVELOPER",
-        fromEmailAddress: email.sender,
-        sourceArn: email.nodes.identity.arn,
-      },
-    },
-  },
+  // triggers: {
+  //   customEmailSender: {
+  //     handler: "",
+  //     logging: {
+  //       format: "json",
+  //       logGroup: communicationLogGroup.name,
+  //     },
+  //   },
+  // },
 });
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
@@ -187,10 +187,6 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/createuser.handler",
-    logging: {
-      format: "json",
-      logGroup: communicationLogGroup.name,
-    },
   },
   routeMetadata
 );
