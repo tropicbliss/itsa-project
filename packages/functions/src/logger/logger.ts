@@ -1,11 +1,12 @@
 import { Resource } from "sst";
 import { z } from "zod";
-import { Context, SQSEvent } from "aws-lambda";
+import { Context, SQSEvent, SQSBatchResponse } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
   BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { splitByPredicate } from "./utils/utils";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -19,19 +20,39 @@ const schema = z.object({
   datetime: z.string().datetime(),
 });
 
-export async function handler(event: SQSEvent, _: Context) {
-  const inputs = event.Records.map((record) =>
-    schema.parse(JSON.stringify(record.body))
+export async function handler(
+  event: SQSEvent,
+  _: Context
+): Promise<SQSBatchResponse> {
+  const inputs = event.Records.map((record) => ({
+    messageId: record.messageId,
+    payload: schema.safeParse(JSON.stringify(record.body)),
+  }));
+  const [successes, failures] = splitByPredicate(
+    inputs,
+    (input) => input.payload.success
   );
-  await dynamoDb.send(
+  const failedMessages = failures.map((failedMsg) => failedMsg.messageId);
+  const response = await dynamoDb.send(
     new BatchWriteCommand({
       RequestItems: {
-        [Resource.Logs.name]: inputs.map((input) => ({
+        [Resource.Logs.name]: successes.map((parsed) => ({
           PutRequest: {
-            Item: input,
+            Item: { ...parsed.payload.data!, id: parsed.messageId },
           },
         })),
       },
     })
   );
+  if (response.UnprocessedItems) {
+    const unprocessedIds = response.UnprocessedItems[Resource.Logs.name].map(
+      (item) => item.PutRequest!.Item!["id"] as string
+    );
+    failedMessages.push(...unprocessedIds);
+  }
+  return {
+    batchItemFailures: failedMessages.map((id) => ({
+      itemIdentifier: id,
+    })),
+  };
 }
