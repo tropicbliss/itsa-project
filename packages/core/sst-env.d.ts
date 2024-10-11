@@ -30,11 +30,19 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
+    "LoggingDLQ": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
     "LoggingQueue": {
       "type": "sst.aws.Queue"
       "url": string
     }
     "Logs": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "LogsDLQDB": {
       "name": string
       "type": "sst.aws.Dynamo"
     }

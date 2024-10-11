@@ -20,7 +20,7 @@ const schema = z.object({
   datetime: z.string().datetime(),
 });
 
-export async function handler(
+export async function main(
   event: SQSEvent,
   _: Context
 ): Promise<SQSBatchResponse> {
@@ -55,4 +55,18 @@ export async function handler(
       itemIdentifier: id,
     })),
   };
+}
+
+export async function dlq(event: SQSEvent, _: Context) {
+  await dynamoDb.send(
+    new BatchWriteCommand({
+      RequestItems: {
+        [Resource.LogsDLQDB.name]: event.Records.map((record) => ({
+          PutRequest: {
+            Item: { id: record.messageId, data: record.body },
+          },
+        })),
+      },
+    })
+  );
 }

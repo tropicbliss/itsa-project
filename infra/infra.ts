@@ -26,11 +26,38 @@ export const loggingDB = new sst.aws.Dynamo("Logs", {
   },
 });
 
-const queue = new sst.aws.Queue("LoggingQueue");
+export const loggingDLQDB = new sst.aws.Dynamo("LogsDLQDB", {
+  fields: {
+    id: "string",
+  },
+  primaryIndex: {
+    hashKey: "id",
+  },
+});
+
+export const dlq = new sst.aws.Queue("LoggingDLQ");
+
+dlq.subscribe(
+  {
+    handler: "packages/functions/src/logger/logger.dlq",
+    link: [loggingDLQDB],
+  },
+  {
+    batch: {
+      partialResponses: false,
+      size: 25,
+      window: "20 seconds",
+    },
+  }
+);
+
+export const queue = new sst.aws.Queue("LoggingQueue", {
+  dlq: dlq.arn,
+});
 
 queue.subscribe(
   {
-    handler: "packages/functions/src/logger/logger.handler",
+    handler: "packages/functions/src/logger/logger.main",
     link: [loggingDB],
   },
   {
