@@ -28,10 +28,19 @@ export const loggingDB = new sst.aws.Dynamo("Logs", {
 
 const queue = new sst.aws.Queue("LoggingQueue");
 
-queue.subscribe({
-  handler: "packages/functions/src/logger/logger.handler",
-  link: [loggingDB],
-});
+queue.subscribe(
+  {
+    handler: "packages/functions/src/logger/logger.handler",
+    link: [loggingDB],
+  },
+  {
+    batch: {
+      partialResponses: true,
+      size: 25,
+      window: "20 seconds",
+    },
+  }
+);
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
 
