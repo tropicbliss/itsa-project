@@ -97,8 +97,28 @@ new aws.cognito.UserInGroup("rootAdminInRootAdminGroup", {
 
 export const clientDatabaseVpc = new sst.aws.Vpc("DatabaseVPC");
 
-export const clientDatabase = new sst.aws.Postgres("ClientDatabase", {
+export const clientDatabase = new sst.aws.Postgres.v1("ClientDatabase", {
   vpc: clientDatabaseVpc,
+});
+
+const mainframeIpAddress = new sst.Secret("MainframeIpAddress");
+
+const mainframePassword = new sst.Secret("MainframePassword");
+
+const mainframeUsername = new sst.Secret("MainframeUsername");
+
+export const transactionImportCron = new sst.aws.Cron("TransactionImport", {
+  schedule: "rate(20 minutes)",
+  job: {
+    handler: "packages/functions/src/agent/crontransactions.handler",
+    timeout: "15 minutes",
+    link: [
+      clientDatabase,
+      mainframeIpAddress,
+      mainframePassword,
+      mainframeUsername,
+    ],
+  },
 });
 
 const routeMetadata = {
@@ -222,6 +242,15 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/getaccounts.handler",
+  },
+  routeMetadata
+);
+
+api.route(
+  "GET /agent/transactions",
+  {
+    link: [userGroups, clientDatabase],
+    handler: "packages/functions/src/agent/gettransactions.handler",
   },
   routeMetadata
 );

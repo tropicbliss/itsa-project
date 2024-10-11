@@ -15,7 +15,7 @@ import {
 export const client = pgTable(
   "client",
   {
-    clientId: uuid("client_id").defaultRandom().primaryKey(),
+    id: uuid("client_id").defaultRandom().primaryKey(),
     firstName: varchar("first_name", { length: 50 }).notNull(),
     lastName: varchar("last_name", { length: 50 }).notNull(),
     dateOfBirth: date("date_of_birth").notNull(),
@@ -39,12 +39,12 @@ export const client = pgTable(
 export const account = pgTable(
   "account",
   {
-    accountId: uuid("account_id").defaultRandom().primaryKey(),
+    id: uuid("account_id").defaultRandom().primaryKey(),
     clientId: uuid("client_id")
-      .references(() => client.clientId, { onDelete: "cascade" })
+      .references(() => client.id, { onDelete: "cascade" })
       .notNull(),
-    accountType: text("account_type").notNull(),
-    accountStatus: text("account_status").notNull(),
+    type: text("account_type").notNull(),
+    status: text("account_status").notNull(),
     openingDate: date("opening_date").notNull(),
     initialDeposit: numeric("initial_deposit", {
       precision: 19,
@@ -78,16 +78,16 @@ export const archive = pgTable(
 export const transactions = pgTable(
   "transactions",
   {
-    transactionId: uuid("transaction_id").primaryKey(),
+    id: uuid("transaction_id").primaryKey(),
     accountId: uuid("account_id").notNull(),
-    transaction: char("transaction", { length: 1 }),
-    amount: numeric("amount", {
+    type: char("transaction_type", { length: 1 }).notNull(),
+    amount: numeric("transaction_amount", {
       precision: 19,
       scale: 4,
     }).notNull(),
     insertedAt: timestamp("inserted_at").defaultNow().notNull(),
-    date: date("date").notNull(),
-    status: text("status").notNull(),
+    date: date("transaction_date").notNull(),
+    status: text("transaction_status").notNull(),
   },
   (table) => {
     return {

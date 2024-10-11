@@ -127,6 +127,20 @@
       "when": 1728641216279,
       "tag": "0017_illegal_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1728641622309,
+      "tag": "0018_low_korvac",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1728645876605,
+      "tag": "0019_fearless_nightmare",
+      "breakpoints": true
     }
   ]
 }

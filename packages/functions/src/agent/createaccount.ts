@@ -1,8 +1,8 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
-import { db } from "../database/drizzle";
-import { account, client } from "../database/schema.sql";
+import { db } from "./database/drizzle";
+import { account, client } from "./database/schema.sql";
 import {
   accountTypeSchema,
   branchIdSchema,
@@ -10,15 +10,15 @@ import {
   currencySchema,
   initialDepositSchema,
   openingDateSchema,
-} from "../database/validators";
+} from "./database/validators";
 import { and, eq } from "drizzle-orm";
 import { VisibleError } from "@itsa-project/core/errors/visibleError";
 
 const schema = z.object({
   clientId: clientIdSchema,
-  accountType: accountTypeSchema,
+  type: accountTypeSchema,
   openingDate: openingDateSchema,
-  initialDeposit: initialDepositSchema,
+  initialDeposit: initialDepositSchema.transform((num) => num.toString()),
   currency: currencySchema,
   branchId: branchIdSchema,
 });
@@ -32,9 +32,7 @@ export const handler = Util.handler(
     const isUserAllowedToModifyClient = await db
       .select()
       .from(client)
-      .where(
-        and(eq(client.clientId, input.clientId), eq(client.agentId, userId))
-      )
+      .where(and(eq(client.id, input.clientId), eq(client.agentId, userId)))
       .limit(1)
       .execute()
       .then((row) => row.length > 0);
@@ -47,7 +45,7 @@ export const handler = Util.handler(
       .insert(account)
       .values({
         ...input,
-        accountStatus: "active",
+        status: "active",
       })
       .execute();
   }

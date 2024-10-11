@@ -1,10 +1,10 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
-import { db } from "../database/drizzle";
-import { account, client } from "../database/schema.sql";
+import { db } from "./database/drizzle";
+import { account, client } from "./database/schema.sql";
 import { eq, and } from "drizzle-orm";
-import { clientIdSchema } from "../database/validators";
+import { clientIdSchema } from "./database/validators";
 import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { NotFoundError } from "@itsa-project/core/errors/visibleError";
 
@@ -24,7 +24,7 @@ export const handler = Util.handler(
       db
         .select()
         .from(client)
-        .where(and(eq(client.clientId, input.id), eq(client.agentId, userId)))
+        .where(and(eq(client.id, input.id), eq(client.agentId, userId)))
         .limit(1)
         .execute()
         .then((result) => result[0]),

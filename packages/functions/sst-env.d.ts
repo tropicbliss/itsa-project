@@ -30,6 +30,18 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
+    "MainframeIpAddress": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "MainframePassword": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "MainframeUsername": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "Region": {
       "name": string
       "type": "sst.sst.Linkable"

@@ -1,10 +1,10 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
-import { db } from "../database/drizzle";
-import { account, client } from "../database/schema.sql";
+import { db } from "./database/drizzle";
+import { account, client } from "./database/schema.sql";
 import { and, eq } from "drizzle-orm";
-import { clientIdSchema } from "../database/validators";
+import { clientIdSchema } from "./database/validators";
 import { VisibleError } from "@itsa-project/core/errors/visibleError";
 
 const schema = z.object({
@@ -20,7 +20,7 @@ export const handler = Util.handler(
     const isUserAllowedToModifyClient = await db
       .select()
       .from(client)
-      .where(and(eq(client.clientId, input.id), eq(client.agentId, userId)))
+      .where(and(eq(client.id, input.id), eq(client.agentId, userId)))
       .limit(1)
       .execute()
       .then((row) => row.length > 0);
@@ -29,6 +29,6 @@ export const handler = Util.handler(
         "User does not have permission to modify this client"
       );
     }
-    await db.delete(account).where(eq(account.accountId, input.id)).execute();
+    await db.delete(account).where(eq(account.id, input.id)).execute();
   }
 );

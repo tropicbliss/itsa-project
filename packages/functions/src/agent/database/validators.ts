@@ -29,12 +29,7 @@ function subtractYearsFromToday(years: number) {
 export const clientIdSchema = z.string().uuid();
 export const accountTypeSchema = z.enum(["savings", "checking", "business"]);
 export const openingDateSchema = z.string().refine(isBefore);
-export const initialDepositSchema = z.string().refine((input) =>
-  isDecimal(input, {
-    force_decimal: true,
-    decimal_digits: "4",
-  })
-);
+export const initialDepositSchema = z.number().nonnegative();
 export const currencySchema = z.string().refine(isCurrencyCode);
 export const branchIdSchema = z.string();
 

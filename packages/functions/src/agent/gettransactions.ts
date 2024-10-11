@@ -2,8 +2,8 @@ import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
-import { account, client, transactions } from "../../database/schema.sql";
-import { db } from "../../database/drizzle";
+import { account, client, transactions } from "./database/schema.sql";
+import { db } from "./database/drizzle";
 
 const schema = z.object({
   page: z.number().int().positive(),
@@ -20,8 +20,8 @@ export const handler = Util.handler(
     const txnInformation = await db
       .select({ transactions })
       .from(account)
-      .innerJoin(client, eq(account.clientId, client.clientId))
-      .innerJoin(transactions, eq(account.accountId, transactions.accountId))
+      .innerJoin(client, eq(account.clientId, client.id))
+      .innerJoin(transactions, eq(account.id, transactions.accountId))
       .where(eq(client.agentId, userId))
       .orderBy(desc(transactions.insertedAt))
       .limit(input.limit)

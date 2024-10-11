@@ -11,9 +11,9 @@
     ]
   },
   "dependencies": {
-    "sst": "3.1.46"
+    "sst": "3.1.78"
   },
   "devDependencies": {
-    "vitest": "^2.0.3"
+    "vitest": "^2.1.2"
   }
 }
