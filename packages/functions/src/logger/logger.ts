@@ -13,6 +13,7 @@ const schema = z.object({
   afterValue: z.any(),
   agentId: z.string().uuid(),
   clientId: z.string().uuid(),
+  datetime: z.string().datetime(),
 });
 
 export async function handler(event: any, _: Context) {
@@ -23,7 +24,6 @@ export async function handler(event: any, _: Context) {
       TableName: Resource.Logs.name,
       Item: {
         ...input,
-        datetime: new Date().toISOString(),
       },
     })
   );
