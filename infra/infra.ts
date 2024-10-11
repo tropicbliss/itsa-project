@@ -32,6 +32,7 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   //       format: "json",
   //       logGroup: communicationLogGroup.name,
   //     },
+  //     link: [email, rootUserEmail],
   //   },
   // },
 });
