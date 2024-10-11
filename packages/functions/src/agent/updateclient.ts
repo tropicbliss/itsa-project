@@ -18,10 +18,11 @@ import {
   stateSchema,
 } from "./database/validators";
 import { eq, and } from "drizzle-orm";
+import { AttributeValue, Log } from "@itsa-project/core/logging";
 
 const schema = z
   .object({
-    clientId: clientIdSchema,
+    id: clientIdSchema,
     firstName: firstNameSchema.optional(),
     lastName: lastNameSchema.optional(),
     dateOfBirth: dateOfBirthSchema.optional(),
@@ -50,12 +51,36 @@ export const handler = Util.handler(
   },
   async ({ body, userId }) => {
     const input = schema.parse(body);
+    const { id, ...inputWithoutId } = input;
+    const rowBeforeUpdate = await db
+      .select()
+      .from(client)
+      .where(and(eq(client.id, id), eq(client.agentId, userId)))
+      .execute()
+      .then((rows) => rows[0]);
+    if (rowBeforeUpdate === undefined) {
+      return;
+    }
     await db
       .update(client)
       .set({
-        ...input,
+        ...inputWithoutId,
       })
-      .where(and(eq(client.id, input.clientId), eq(client.agentId, userId)))
+      .where(and(eq(client.id, id), eq(client.agentId, userId)))
       .execute();
+    let attributes: Record<string, AttributeValue> = {};
+    Object.keys(input)
+      .filter((field) => field !== "id")
+      .forEach((key) => {
+        attributes[key] = {
+          beforeValue: rowBeforeUpdate[key as keyof typeof rowBeforeUpdate],
+          afterValue: input[key as keyof typeof input],
+        };
+      });
+    Log.updateClient({
+      agentId: userId,
+      clientId: id,
+      attributes,
+    });
   }
 );

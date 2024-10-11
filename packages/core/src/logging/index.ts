@@ -59,9 +59,9 @@ type U = {
   attributes: Record<string, AttributeValue>;
 } & Common;
 
-type AttributeValue = {
-  beforeValue: string;
-  afterValue: string;
+export type AttributeValue = {
+  beforeValue: unknown;
+  afterValue: unknown;
 };
 
 type Data = CRD | U;
@@ -83,10 +83,10 @@ function logRaw(data: Data) {
         attributeName: Object.keys(data.attributes).join("|"),
         clientId: data.clientId,
         afterValue: Object.values(data.attributes)
-          .map((val) => val.afterValue)
+          .map((val) => JSON.stringify(val.afterValue))
           .join("|"),
         beforeValue: Object.values(data.attributes)
-          .map((val) => val.beforeValue)
+          .map((val) => JSON.stringify(val.beforeValue))
           .join("|"),
       };
       break;
