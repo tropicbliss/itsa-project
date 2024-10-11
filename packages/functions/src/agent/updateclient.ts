@@ -18,7 +18,7 @@ import {
   stateSchema,
 } from "./database/validators";
 import { eq, and } from "drizzle-orm";
-import { AttributeValue, Log } from "@itsa-project/core/logging";
+import { type AttributeValue, Log } from "@itsa-project/core/logging";
 
 const schema = z
   .object({
