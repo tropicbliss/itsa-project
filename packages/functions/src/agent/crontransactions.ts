@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "./database/drizzle";
 import { transactions } from "./database/schema.sql";
 import { initialDepositSchema } from "./database/validators";
+import { UUID } from "@itsa-project/core/misc";
 
 const sftp = new Client();
 
@@ -18,12 +19,6 @@ const schema = z.object({
   status: z.enum(["completed", "pending", "failed"]),
 });
 
-function isValidUUIDJson(filename: string) {
-  const uuidJsonRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.json$/i;
-  return uuidJsonRegex.test(filename);
-}
-
 export const handler = async (_: any) => {
   await sftp.connect({
     host: Resource.MainframeIpAddress.value,
@@ -35,7 +30,7 @@ export const handler = async (_: any) => {
     (file) => file.name
   );
   for (const file of fileList) {
-    if (!isValidUUIDJson(file)) {
+    if (!UUID.isValidUUIDJson(file)) {
       continue;
     }
     const fileContent = (
