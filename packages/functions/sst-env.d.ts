@@ -22,6 +22,10 @@ declare module "sst" {
     "DatabaseVPC": {
       "type": "sst.aws.Vpc"
     }
+    "Email": {
+      "sender": string
+      "type": "sst.aws.Email"
+    }
     "Frontend": {
       "type": "sst.aws.StaticSite"
       "url": string

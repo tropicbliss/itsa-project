@@ -18,6 +18,7 @@ import {
 } from "./database/validators";
 import { eq } from "drizzle-orm";
 import { VisibleError } from "@itsa-project/core/errors/visibleError";
+import { Log } from "@itsa-project/core/logging";
 
 const schema = z
   .object({
@@ -51,12 +52,17 @@ export const handler = Util.handler(
       throw new VisibleError("An agent can only be responsible for one client");
     }
     const input = schema.parse(body);
-    await db
+    const response = await db
       .insert(client)
       .values({
         ...input,
         agentId: userId,
       })
+      .returning()
       .execute();
+    Log.createClient({
+      agentId: userId,
+      clientId: response[0].id,
+    });
   }
 );

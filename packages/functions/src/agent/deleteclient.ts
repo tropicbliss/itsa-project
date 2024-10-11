@@ -5,6 +5,7 @@ import { db } from "./database/drizzle";
 import { client } from "./database/schema.sql";
 import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./database/validators";
+import { Log } from "@itsa-project/core/logging";
 
 const schema = z.object({
   id: clientIdSchema,
@@ -20,5 +21,9 @@ export const handler = Util.handler(
       .delete(client)
       .where(and(eq(client.id, input.id), eq(client.agentId, userId)))
       .execute();
+    Log.deleteClient({
+      agentId: userId,
+      clientId: input.id,
+    });
   }
 );

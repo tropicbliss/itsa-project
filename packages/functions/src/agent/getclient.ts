@@ -7,6 +7,7 @@ import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./database/validators";
 import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { NotFoundError } from "@itsa-project/core/errors/visibleError";
+import { Log } from "@itsa-project/core/logging";
 
 const s3Client = new S3Client({ region: Resource.Region.name });
 
@@ -48,6 +49,10 @@ export const handler = Util.handler(
     if (clientRow === undefined) {
       throw new NotFoundError("Client id not found");
     }
+    Log.readClient({
+      agentId: userId,
+      clientId: input.id,
+    });
     return { isVerified, accounts, client: clientRow };
   }
 );

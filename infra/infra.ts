@@ -2,10 +2,50 @@ export const region = new sst.Linkable("Region", {
   properties: { name: aws.getRegionOutput().name },
 });
 
+const rootUserEmail = new sst.Secret("RootUserEmail");
+
+const logGroup = new aws.cloudwatch.LogGroup("LogGroup", {
+  name: "main",
+  retentionInDays: 0,
+});
+
+const sesConfigSet = new aws.ses.ConfigurationSet("SESConfigurationSet");
+
+new aws.ses.EventDestination("SESEventDestination", {
+  configurationSetName: sesConfigSet.name,
+  matchingTypes: ["send"],
+  enabled: true,
+  cloudwatchDestinations: [
+    {
+      defaultValue: logGroup.name,
+      dimensionName: "email",
+      valueSource: "emailHeader",
+    },
+  ],
+});
+
+export const email = new sst.aws.Email("Email", {
+  sender: rootUserEmail.value,
+  transform: {
+    identity: {
+      configurationSetName: sesConfigSet.name,
+    },
+  },
+});
+
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
   mfa: "on",
   softwareToken: true,
+  transform: {
+    userPool: {
+      emailConfiguration: {
+        emailSendingAccount: "DEVELOPER",
+        fromEmailAddress: email.sender,
+        sourceArn: email.nodes.identity.arn,
+      },
+    },
+  },
 });
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
@@ -72,8 +112,6 @@ export const userGroups = new sst.Linkable("UserGroups", {
     agent: agent.name,
   },
 });
-
-const rootUserEmail = new sst.Secret("RootUserEmail");
 
 const rootUserPassword = new sst.Secret("RootUserPassword");
 
@@ -179,6 +217,10 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/deleteclient.handler",
+    logging: {
+      format: "json",
+      logGroup: logGroup.name,
+    },
   },
   routeMetadata
 );
@@ -206,6 +248,10 @@ api.route(
   {
     link: [userGroups, clientDatabase, bucket],
     handler: "packages/functions/src/agent/getclient.handler",
+    logging: {
+      format: "json",
+      logGroup: logGroup.name,
+    },
   },
   routeMetadata
 );
@@ -215,6 +261,10 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/createclient.handler",
+    logging: {
+      format: "json",
+      logGroup: logGroup.name,
+    },
   },
   routeMetadata
 );
@@ -224,6 +274,10 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/updateclient.handler",
+    logging: {
+      format: "json",
+      logGroup: logGroup.name,
+    },
   },
   routeMetadata
 );
