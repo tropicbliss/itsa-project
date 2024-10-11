@@ -30,9 +30,9 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
-    "Logger": {
-      "name": string
-      "type": "sst.aws.Function"
+    "LoggingQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
     }
     "Logs": {
       "name": string

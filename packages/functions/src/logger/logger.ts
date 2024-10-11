@@ -1,8 +1,11 @@
 import { Resource } from "sst";
 import { z } from "zod";
-import { Context } from "aws-lambda";
+import { Context, SQSEvent } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  BatchWriteCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -16,14 +19,18 @@ const schema = z.object({
   datetime: z.string().datetime(),
 });
 
-export async function handler(event: any, _: Context) {
-  const body = JSON.stringify(event);
-  const input = schema.parse(body);
+export async function handler(event: SQSEvent, _: Context) {
+  const inputs = event.Records.map((record) =>
+    schema.parse(JSON.stringify(record.body))
+  );
   await dynamoDb.send(
-    new PutCommand({
-      TableName: Resource.Logs.name,
-      Item: {
-        ...input,
+    new BatchWriteCommand({
+      RequestItems: {
+        [Resource.Logs.name]: inputs.map((input) => ({
+          PutRequest: {
+            Item: input,
+          },
+        })),
       },
     })
   );

@@ -26,7 +26,9 @@ export const loggingDB = new sst.aws.Dynamo("Logs", {
   },
 });
 
-export const logger = new sst.aws.Function("Logger", {
+const queue = new sst.aws.Queue("LoggingQueue");
+
+queue.subscribe({
   handler: "packages/functions/src/logger/logger.handler",
   link: [loggingDB],
 });
