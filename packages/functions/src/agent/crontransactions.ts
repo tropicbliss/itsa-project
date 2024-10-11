@@ -52,7 +52,9 @@ export const handler = async (_: any) => {
           })
           .onConflictDoUpdate({
             target: transactions.id,
-            set: data,
+            set: {
+              status: data.status,
+            },
           })
           .execute();
         await sftp.rename(
