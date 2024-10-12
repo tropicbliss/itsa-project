@@ -43,14 +43,6 @@ export const api = new sst.aws.ApiGatewayV2("Api", {
   cors: {
     allowHeaders: ["Authorization", "Content-Type"],
   },
-  transform: {
-    stage: {
-      accessLogSettings: {
-        destinationArn: "",
-        format: "",
-      },
-    },
-  },
 });
 
 export const bucket = new sst.aws.Bucket("Uploads");
@@ -143,7 +135,7 @@ const mainframePassword = new sst.Secret("MainframePassword");
 const mainframeUsername = new sst.Secret("MainframeUsername");
 
 export const transactionImportCron = new sst.aws.Cron("TransactionImport", {
-  schedule: "rate(20 minutes)",
+  schedule: "rate(18 minutes)",
   job: {
     handler: "packages/functions/src/agent/crontransactions.handler",
     timeout: "15 minutes",
