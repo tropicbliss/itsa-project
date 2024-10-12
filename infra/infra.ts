@@ -4,6 +4,8 @@ export const region = new sst.Linkable("Region", {
 
 const rootUserEmail = new sst.Secret("RootUserEmail");
 
+const rootUserPassword = new sst.Secret("RootUserPassword");
+
 const lambdaLogGroup = new aws.cloudwatch.LogGroup("LambdaLogGroup", {
   name: "lambda",
   retentionInDays: 0,
@@ -102,8 +104,6 @@ export const userGroups = new sst.Linkable("UserGroups", {
   },
 });
 
-const rootUserPassword = new sst.Secret("RootUserPassword");
-
 const rootAdminUser = new aws.cognito.User("rootAdminUser", {
   username: "rootadmin",
   userPoolId: userPool.id,
@@ -134,7 +134,7 @@ const mainframePassword = new sst.Secret("MainframePassword");
 
 const mainframeUsername = new sst.Secret("MainframeUsername");
 
-export const transactionImportCron = new sst.aws.Cron("TransactionImport", {
+export const transactionImportCron = new sst.aws.Cron("TransactionImportCron", {
   schedule: "rate(18 minutes)",
   job: {
     handler: "packages/functions/src/agent/crontransactions.handler",
