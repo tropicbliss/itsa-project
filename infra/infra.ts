@@ -145,6 +145,7 @@ export const transactionImportCron = new sst.aws.Cron("TransactionImport", {
       mainframePassword,
       mainframeUsername,
     ],
+    logging: false,
   },
 });
 
@@ -161,6 +162,7 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/getusers.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -170,6 +172,7 @@ api.route(
   {
     link: [region, userGroups, userPool, clientDatabase],
     handler: "packages/functions/src/admin/deleteuser.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -179,6 +182,7 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/disableuser.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -188,6 +192,7 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/createuser.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -197,6 +202,7 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/updateuser.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -219,6 +225,7 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/deleteaccount.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -228,6 +235,7 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/createaccount.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -276,6 +284,7 @@ api.route(
   {
     link: [userGroups, clientDatabase, bucket],
     handler: "packages/functions/src/agent/verifyclient.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -285,6 +294,7 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/getaccounts.handler",
+    logging: false,
   },
   routeMetadata
 );
@@ -294,6 +304,7 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/gettransactions.handler",
+    logging: false,
   },
   routeMetadata
 );
