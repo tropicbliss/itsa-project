@@ -43,6 +43,14 @@ export const api = new sst.aws.ApiGatewayV2("Api", {
   cors: {
     allowHeaders: ["Authorization", "Content-Type"],
   },
+  transform: {
+    stage: {
+      accessLogSettings: {
+        destinationArn: "",
+        format: "",
+      },
+    },
+  },
 });
 
 export const bucket = new sst.aws.Bucket("Uploads");
