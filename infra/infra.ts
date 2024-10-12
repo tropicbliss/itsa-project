@@ -134,20 +134,20 @@ const mainframePassword = new sst.Secret("MainframePassword");
 
 const mainframeUsername = new sst.Secret("MainframeUsername");
 
-export const transactionImportCron = new sst.aws.Cron("TransactionImportCron", {
-  schedule: "rate(18 minutes)",
-  job: {
-    handler: "packages/functions/src/agent/crontransactions.handler",
-    timeout: "15 minutes",
-    link: [
-      clientDatabase,
-      mainframeIpAddress,
-      mainframePassword,
-      mainframeUsername,
-    ],
-    logging: false,
-  },
-});
+// export const transactionImportCron = new sst.aws.Cron("TransactionImportCron", {
+//   schedule: "rate(18 minutes)",
+//   job: {
+//     handler: "packages/functions/src/agent/crontransactions.handler",
+//     timeout: "15 minutes",
+//     link: [
+//       clientDatabase,
+//       mainframeIpAddress,
+//       mainframePassword,
+//       mainframeUsername,
+//     ],
+//     logging: false,
+//   },
+// });
 
 const routeMetadata = {
   auth: {
