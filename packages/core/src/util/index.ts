@@ -48,6 +48,7 @@ export namespace Util {
               error: errors,
             };
           } else {
+            console.error(error);
             statusCode = 500;
             body = {
               error: "Something went horribly wrong",

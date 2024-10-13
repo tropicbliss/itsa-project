@@ -77,7 +77,7 @@ export const handler = Util.handler(
           afterValue: input[key as keyof typeof input],
         };
       });
-    Log.updateClient({
+    await Log.updateClient({
       agentId: userId,
       clientId: id,
       attributes,

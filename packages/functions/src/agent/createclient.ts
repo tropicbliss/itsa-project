@@ -60,7 +60,7 @@ export const handler = Util.handler(
       })
       .returning()
       .execute();
-    Log.createClient({
+    await Log.createClient({
       agentId: userId,
       clientId: response[0].id,
     });

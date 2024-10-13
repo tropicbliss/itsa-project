@@ -1,42 +1,84 @@
+import {
+  CloudWatchLogsClient,
+  PutLogEventsCommand,
+  CreateLogStreamCommand,
+  DescribeLogStreamsCommand,
+} from "@aws-sdk/client-cloudwatch-logs";
+import { Resource } from "sst";
+
+const LOG_STREAM_NAME = "main";
+
+const client = new CloudWatchLogsClient({ region: Resource.Region.name });
+
 export namespace Log {
-  export function createClient(data: Common) {
-    logRaw({
+  export async function createClient(data: Common) {
+    await logRaw({
       ...data,
       crud: "create",
     });
   }
 
-  export function readClient(data: Common) {
-    logRaw({
+  export async function readClient(data: Common) {
+    await logRaw({
       ...data,
       crud: "read",
     });
   }
 
-  export function deleteClient(data: Common) {
-    logRaw({
+  export async function deleteClient(data: Common) {
+    await logRaw({
       ...data,
       crud: "delete",
     });
   }
 
-  export function updateClient(
+  export async function updateClient(
     data: Common & { attributes: Record<string, AttributeValue> }
   ) {
-    logRaw({
+    await logRaw({
       crud: "update",
       ...data,
     });
   }
 
-  export function sendEmail(data: {
-    recipient: string;
-    status: "sent" | "failed";
-  }) {
-    console.log(
-      JSON.stringify({
-        type: "email",
-        ...data,
+  export async function sendEmail(
+    data: {
+      recipient: string;
+      status: "sent" | "failed";
+    },
+    timestamp: string
+  ) {
+    const logGroup = Resource.CommunicationLogGroup.name;
+    await client.send(
+      new CreateLogStreamCommand({
+        logGroupName: logGroup,
+        logStreamName: LOG_STREAM_NAME,
+      })
+    );
+    const { logStreams } = await client.send(
+      new DescribeLogStreamsCommand({
+        logGroupName: logGroup,
+        logStreamNamePrefix: LOG_STREAM_NAME,
+      })
+    );
+    const sequenceToken =
+      logStreams && logStreams.length > 0
+        ? logStreams[0].uploadSequenceToken
+        : undefined;
+    await client.send(
+      new PutLogEventsCommand({
+        logGroupName: logGroup,
+        logStreamName: LOG_STREAM_NAME,
+        logEvents: [
+          {
+            message: JSON.stringify({
+              type: "email",
+              ...data,
+            }),
+            timestamp: new Date(timestamp).getTime(),
+          },
+        ],
+        sequenceToken,
       })
     );
   }
@@ -75,7 +117,8 @@ type Output = {
   afterValue?: string;
 } & Common;
 
-function logRaw(data: Data) {
+async function logRaw(data: Data) {
+  const logGroup = Resource.LambdaLogGroup.name;
   let output: Output;
   switch (data.crud) {
     case "update":
@@ -102,5 +145,33 @@ function logRaw(data: Data) {
         clientId: data.clientId,
       };
   }
-  console.log(JSON.stringify(output));
+  await client.send(
+    new CreateLogStreamCommand({
+      logGroupName: logGroup,
+      logStreamName: LOG_STREAM_NAME,
+    })
+  );
+  const { logStreams } = await client.send(
+    new DescribeLogStreamsCommand({
+      logGroupName: logGroup,
+      logStreamNamePrefix: LOG_STREAM_NAME,
+    })
+  );
+  const sequenceToken =
+    logStreams && logStreams.length > 0
+      ? logStreams[0].uploadSequenceToken
+      : undefined;
+  await client.send(
+    new PutLogEventsCommand({
+      logGroupName: logGroup,
+      logStreamName: LOG_STREAM_NAME,
+      logEvents: [
+        {
+          message: JSON.stringify(output),
+          timestamp: new Date().getTime(),
+        },
+      ],
+      sequenceToken,
+    })
+  );
 }

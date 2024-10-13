@@ -49,7 +49,7 @@ export const handler = Util.handler(
     if (clientRow === undefined) {
       throw new NotFoundError("Client id not found");
     }
-    Log.readClient({
+    await Log.readClient({
       agentId: userId,
       clientId: input.id,
     });

@@ -21,7 +21,7 @@ export const handler = Util.handler(
       .delete(client)
       .where(and(eq(client.id, input.id), eq(client.agentId, userId)))
       .execute();
-    Log.deleteClient({
+    await Log.deleteClient({
       agentId: userId,
       clientId: input.id,
     });
