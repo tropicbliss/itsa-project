@@ -14,7 +14,7 @@ Linkable.wrap(aws.cloudwatch.LogGroup, (logGroup) => ({
   include: [
     sst.aws.permission({
       actions: [
-        "logs:CreateLogGroup",
+        "logs:DescribeLogStreams",
         "logs:CreateLogStream",
         "logs:PutLogEvents",
       ],
