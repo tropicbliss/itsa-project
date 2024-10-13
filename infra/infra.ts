@@ -26,13 +26,13 @@ export const email = new sst.aws.Email("Email", {
 
 export const emailTopic = new sst.aws.SnsTopic("EmailTopic");
 
-new aws.ses.IdentityNotificationTopic("SesNotification", {
+new aws.ses.IdentityNotificationTopic("SuccessSnsNotification", {
   identity: email.sender,
   notificationType: "Delivery",
   topicArn: emailTopic.arn,
 });
 
-new aws.ses.IdentityNotificationTopic("SesNotifications", {
+new aws.ses.IdentityNotificationTopic("FailureSnsNotification", {
   identity: email.sender,
   notificationType: "Bounce",
   topicArn: emailTopic.arn,
