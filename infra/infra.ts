@@ -2,9 +2,10 @@ export const region = new sst.Linkable("Region", {
   properties: { name: aws.getRegionOutput().name },
 });
 
-const rootUserEmail = new sst.Secret("RootUserEmail");
-
-const rootUserPassword = new sst.Secret("RootUserPassword");
+const rootUserSecrets = {
+  email: new sst.Secret("RootUserEmail"),
+  password: new sst.Secret("RootUserPassword"),
+};
 
 const lambdaLogGroup = new aws.cloudwatch.LogGroup("LambdaLogGroup", {
   name: "lambda",
@@ -20,7 +21,7 @@ const communicationLogGroup = new aws.cloudwatch.LogGroup(
 );
 
 export const email = new sst.aws.Email("Email", {
-  sender: rootUserEmail.value,
+  sender: rootUserSecrets.email.value,
 });
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
@@ -111,9 +112,9 @@ const rootAdminUser = new aws.cognito.User("rootAdminUser", {
     email_verified: "true",
     given_name: "Root",
     family_name: "Admin",
-    email: rootUserEmail.value,
+    email: rootUserSecrets.email.value,
   },
-  password: rootUserPassword.value,
+  password: rootUserSecrets.password.value,
 });
 
 new aws.cognito.UserInGroup("rootAdminInRootAdminGroup", {
@@ -128,23 +129,18 @@ export const clientDatabase = new sst.aws.Postgres.v1("ClientDatabase", {
   vpc: clientDatabaseVpc,
 });
 
-const mainframeIpAddress = new sst.Secret("MainframeIpAddress");
-
-const mainframePassword = new sst.Secret("MainframePassword");
-
-const mainframeUsername = new sst.Secret("MainframeUsername");
+const mainframeSecrets = Object.values({
+  ipAddress: new sst.Secret("MainframeIpAddress"),
+  username: new sst.Secret("MainframeUsername"),
+  password: new sst.Secret("MainframePassword"),
+});
 
 // export const transactionImportCron = new sst.aws.Cron("TransactionImportCron", {
 //   schedule: "rate(18 minutes)",
 //   job: {
 //     handler: "packages/functions/src/agent/crontransactions.handler",
 //     timeout: "15 minutes",
-//     link: [
-//       clientDatabase,
-//       mainframeIpAddress,
-//       mainframePassword,
-//       mainframeUsername,
-//     ],
+//     link: [clientDatabase, ...mainframeSecrets],
 //     logging: false,
 //   },
 // });
