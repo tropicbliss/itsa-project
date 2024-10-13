@@ -41,25 +41,29 @@ export const handler = Util.handler(
     allowedGroups: [Resource.UserGroups.agent],
   },
   async ({ body, userId }) => {
-    const hasPreexistingClients = await db
-      .select()
-      .from(client)
-      .where(eq(client.agentId, userId))
-      .limit(1)
-      .execute()
-      .then((row) => row.length > 0);
-    if (hasPreexistingClients) {
-      throw new VisibleError("An agent can only be responsible for one client");
-    }
-    const input = schema.parse(body);
-    const response = await db
-      .insert(client)
-      .values({
-        ...input,
-        agentId: userId,
-      })
-      .returning()
-      .execute();
+    const response = await db.transaction(async (tx) => {
+      const hasPreexistingClients = await tx
+        .select()
+        .from(client)
+        .where(eq(client.agentId, userId))
+        .limit(1)
+        .execute()
+        .then((row) => row.length > 0);
+      if (hasPreexistingClients) {
+        throw new VisibleError(
+          "An agent can only be responsible for one client"
+        );
+      }
+      const input = schema.parse(body);
+      return await tx
+        .insert(client)
+        .values({
+          ...input,
+          agentId: userId,
+        })
+        .returning()
+        .execute();
+    });
     await Log.createClient({
       agentId: userId,
       clientId: response[0].id,

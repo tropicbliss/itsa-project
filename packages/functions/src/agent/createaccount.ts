@@ -29,24 +29,26 @@ export const handler = Util.handler(
   },
   async ({ body, userId }) => {
     const input = schema.parse(body);
-    const isUserAllowedToModifyClient = await db
-      .select()
-      .from(client)
-      .where(and(eq(client.id, input.clientId), eq(client.agentId, userId)))
-      .limit(1)
-      .execute()
-      .then((row) => row.length > 0);
-    if (!isUserAllowedToModifyClient) {
-      throw new VisibleError(
-        "User does not have permission to modify this client"
-      );
-    }
-    await db
-      .insert(account)
-      .values({
-        ...input,
-        status: "active",
-      })
-      .execute();
+    await db.transaction(async (tx) => {
+      const isUserAllowedToModifyClient = await tx
+        .select()
+        .from(client)
+        .where(and(eq(client.id, input.clientId), eq(client.agentId, userId)))
+        .limit(1)
+        .execute()
+        .then((row) => row.length > 0);
+      if (!isUserAllowedToModifyClient) {
+        throw new VisibleError(
+          "User does not have permission to modify this client"
+        );
+      }
+      await tx
+        .insert(account)
+        .values({
+          ...input,
+          status: "active",
+        })
+        .execute();
+    });
   }
 );

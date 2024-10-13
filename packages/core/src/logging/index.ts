@@ -6,8 +6,6 @@ import {
 } from "@aws-sdk/client-cloudwatch-logs";
 import { Resource } from "sst";
 
-const LOG_STREAM_NAME = "main";
-
 const client = new CloudWatchLogsClient({ region: Resource.Region.name });
 
 export namespace Log {
