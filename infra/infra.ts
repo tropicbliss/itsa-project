@@ -1,3 +1,5 @@
+import { Linkable } from "../.sst/platform/src/components";
+
 export const region = new sst.Linkable("Region", {
   properties: { name: aws.getRegionOutput().name },
 });
@@ -6,6 +8,20 @@ const rootUserSecrets = {
   email: new sst.Secret("RootUserEmail"),
   password: new sst.Secret("RootUserPassword"),
 };
+
+Linkable.wrap(aws.cloudwatch.LogGroup, (logGroup) => ({
+  properties: { name: logGroup.name },
+  include: [
+    sst.aws.permission({
+      actions: [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+      ],
+      resources: ["*"],
+    }),
+  ],
+}));
 
 const lambdaLogGroup = new aws.cloudwatch.LogGroup("LambdaLogGroup", {
   name: "lambda",
@@ -40,10 +56,7 @@ new aws.ses.IdentityNotificationTopic("FailureSnsNotification", {
 
 // emailTopic.subscribe({
 //   handler: "",
-//   logging: {
-//     format: "json",
-//     logGroup: communicationLogGroup.name,
-//   },
+//   link: [communicationLogGroup]
 // });
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
@@ -153,7 +166,6 @@ const mainframeSecrets = Object.values({
 //     handler: "packages/functions/src/agent/crontransactions.handler",
 //     timeout: "15 minutes",
 //     link: [clientDatabase, ...mainframeSecrets],
-//     logging: false,
 //   },
 // });
 
@@ -170,7 +182,6 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/getusers.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -180,7 +191,6 @@ api.route(
   {
     link: [region, userGroups, userPool, clientDatabase],
     handler: "packages/functions/src/admin/deleteuser.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -190,7 +200,6 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/disableuser.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -200,7 +209,6 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/createuser.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -210,7 +218,6 @@ api.route(
   {
     link: [region, userGroups, userPool],
     handler: "packages/functions/src/admin/updateuser.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -218,12 +225,8 @@ api.route(
 api.route(
   "DELETE /agent/client",
   {
-    link: [userGroups, clientDatabase],
+    link: [userGroups, clientDatabase, lambdaLogGroup],
     handler: "packages/functions/src/agent/deleteclient.handler",
-    logging: {
-      format: "json",
-      logGroup: lambdaLogGroup.name,
-    },
   },
   routeMetadata
 );
@@ -233,7 +236,6 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/deleteaccount.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -243,7 +245,6 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/createaccount.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -251,12 +252,8 @@ api.route(
 api.route(
   "GET /agent/client",
   {
-    link: [userGroups, clientDatabase, bucket],
+    link: [userGroups, clientDatabase, bucket, lambdaLogGroup],
     handler: "packages/functions/src/agent/getclient.handler",
-    logging: {
-      format: "json",
-      logGroup: lambdaLogGroup.name,
-    },
   },
   routeMetadata
 );
@@ -264,12 +261,8 @@ api.route(
 api.route(
   "POST /agent/client",
   {
-    link: [userGroups, clientDatabase],
+    link: [userGroups, clientDatabase, lambdaLogGroup],
     handler: "packages/functions/src/agent/createclient.handler",
-    logging: {
-      format: "json",
-      logGroup: lambdaLogGroup.name,
-    },
   },
   routeMetadata
 );
@@ -277,12 +270,8 @@ api.route(
 api.route(
   "PUT /agent/client",
   {
-    link: [userGroups, clientDatabase],
+    link: [userGroups, clientDatabase, lambdaLogGroup],
     handler: "packages/functions/src/agent/updateclient.handler",
-    logging: {
-      format: "json",
-      logGroup: lambdaLogGroup.name,
-    },
   },
   routeMetadata
 );
@@ -292,7 +281,6 @@ api.route(
   {
     link: [userGroups, clientDatabase, bucket],
     handler: "packages/functions/src/agent/verifyclient.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -302,7 +290,6 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/getaccounts.handler",
-    logging: false,
   },
   routeMetadata
 );
@@ -312,7 +299,6 @@ api.route(
   {
     link: [userGroups, clientDatabase],
     handler: "packages/functions/src/agent/gettransactions.handler",
-    logging: false,
   },
   routeMetadata
 );

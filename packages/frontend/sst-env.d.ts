@@ -19,6 +19,10 @@ declare module "sst" {
       "type": "sst.aws.Postgres"
       "username": string
     }
+    "CommunicationLogGroup": {
+      "name": string
+      "type": "aws.cloudwatch/logGroup.LogGroup"
+    }
     "DatabaseVPC": {
       "type": "sst.aws.Vpc"
     }
@@ -37,6 +41,10 @@ declare module "sst" {
     "IdentityPool": {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
+    }
+    "LambdaLogGroup": {
+      "name": string
+      "type": "aws.cloudwatch/logGroup.LogGroup"
     }
     "MainframeIpAddress": {
       "type": "sst.sst.Secret"
