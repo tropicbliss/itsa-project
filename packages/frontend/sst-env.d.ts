@@ -26,6 +26,10 @@ declare module "sst" {
       "sender": string
       "type": "sst.aws.Email"
     }
+    "EmailTopic": {
+      "arn": string
+      "type": "sst.aws.SnsTopic"
+    }
     "Frontend": {
       "type": "sst.aws.StaticSite"
       "url": string

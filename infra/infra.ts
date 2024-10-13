@@ -24,20 +24,32 @@ export const email = new sst.aws.Email("Email", {
   sender: rootUserSecrets.email.value,
 });
 
+export const emailTopic = new sst.aws.SnsTopic("EmailTopic");
+
+new aws.ses.IdentityNotificationTopic("SesNotification", {
+  identity: email.sender,
+  notificationType: "Delivery",
+  topicArn: emailTopic.arn,
+});
+
+new aws.ses.IdentityNotificationTopic("SesNotifications", {
+  identity: email.sender,
+  notificationType: "Bounce",
+  topicArn: emailTopic.arn,
+});
+
+// emailTopic.subscribe({
+//   handler: "",
+//   logging: {
+//     format: "json",
+//     logGroup: communicationLogGroup.name,
+//   },
+// });
+
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
   mfa: "on",
   softwareToken: true,
-  // triggers: {
-  //   customEmailSender: {
-  //     handler: "",
-  //     logging: {
-  //       format: "json",
-  //       logGroup: communicationLogGroup.name,
-  //     },
-  //     link: [email, rootUserEmail],
-  //   },
-  // },
 });
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
