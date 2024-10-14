@@ -343,6 +343,12 @@ api.route(
   routeMetadata
 );
 
+new sst.aws.Function("InternalNightmareApi", {
+  handler: "packages/functions/src/agent/internalnightmareapi.handler",
+  url: true,
+  link: [clientDatabase],
+});
+
 export const frontend = new sst.aws.StaticSite("Frontend", {
   path: "packages/frontend",
   build: {

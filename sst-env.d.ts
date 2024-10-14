@@ -50,6 +50,11 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
+    "InternalNightmareApi": {
+      "name": string
+      "type": "sst.aws.Function"
+      "url": string
+    }
     "LambdaLogGroup": {
       "name": string
       "type": "aws.cloudwatch/logGroup.LogGroup"
