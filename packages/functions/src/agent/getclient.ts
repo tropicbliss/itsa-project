@@ -6,7 +6,7 @@ import { account, client } from "./database/schema.sql";
 import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./database/validators";
 import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { NotFoundError } from "@itsa-project/core/errors/visibleError";
+import { NotFoundError } from "@itsa-project/core/errors";
 import { Log } from "@itsa-project/core/logging";
 
 const s3Client = new S3Client({ region: Resource.Region.name });

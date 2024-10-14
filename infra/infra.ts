@@ -40,27 +40,62 @@ export const email = new sst.aws.Email("Email", {
   sender: rootUserSecrets.email.value,
 });
 
-export const emailTopic = new sst.aws.SnsTopic("EmailTopic");
+// export const emailTopic = new sst.aws.SnsTopic("EmailTopic");
 
-new aws.ses.IdentityNotificationTopic("SuccessSnsNotification", {
-  identity: email.sender,
-  notificationType: "Delivery",
-  topicArn: emailTopic.arn,
-});
+// new aws.ses.IdentityNotificationTopic("SuccessSnsNotification", {
+//   identity: email.sender,
+//   notificationType: "Delivery",
+//   topicArn: emailTopic.arn,
+// });
 
-new aws.ses.IdentityNotificationTopic("FailureSnsNotification", {
-  identity: email.sender,
-  notificationType: "Bounce",
-  topicArn: emailTopic.arn,
-});
+// new aws.ses.IdentityNotificationTopic("FailureSnsNotification", {
+//   identity: email.sender,
+//   notificationType: "Bounce",
+//   topicArn: emailTopic.arn,
+// });
 
-emailTopic.subscribe({
-  handler: "packages/functions/src/email/emaillogging.handler",
-  link: [communicationLogGroup],
+// emailTopic.subscribe({
+//   handler: "packages/functions/src/email/emaillogging.handler",
+//   link: [communicationLogGroup],
+// });
+
+Linkable.wrap(aws.kms.Key, (kmsKey) => ({
+  properties: { arn: kmsKey.arn },
+  include: [
+    sst.aws.permission({
+      actions: ["kms:Decrypt"],
+      resources: [kmsKey.arn],
+    }),
+  ],
+}));
+
+const kmsKey = new aws.kms.Key("EmailSenderKey");
+
+Linkable.wrap(aws.kms.Alias, (keyAlias) => ({
+  properties: { alias: keyAlias.name },
+}));
+
+const keyAlias = new aws.kms.Alias("EmailSenderKeyAlias", {
+  targetKeyId: kmsKey.id,
+  name: "alias/emailSenderKey",
 });
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
+  triggers: {
+    customEmailSender: {
+      handler: "packages/functions/src/email/emaillogging.handler",
+      link: [
+        email,
+        kmsKey,
+        keyAlias,
+        rootUserSecrets.email,
+        communicationLogGroup,
+        region,
+      ],
+    },
+    kmsKey: kmsKey.arn as any,
+  },
   // mfa: "on",
   // softwareToken: true,
 });
@@ -228,7 +263,7 @@ api.route(
 api.route(
   "DELETE /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup],
+    link: [userGroups, clientDatabase, lambdaLogGroup, region],
     handler: "packages/functions/src/agent/deleteclient.handler",
   },
   routeMetadata
@@ -255,7 +290,7 @@ api.route(
 api.route(
   "GET /agent/client",
   {
-    link: [userGroups, clientDatabase, bucket, lambdaLogGroup],
+    link: [userGroups, clientDatabase, bucket, lambdaLogGroup, region],
     handler: "packages/functions/src/agent/getclient.handler",
   },
   routeMetadata
@@ -264,7 +299,7 @@ api.route(
 api.route(
   "POST /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup],
+    link: [userGroups, clientDatabase, lambdaLogGroup, region],
     handler: "packages/functions/src/agent/createclient.handler",
   },
   routeMetadata
@@ -273,7 +308,7 @@ api.route(
 api.route(
   "PUT /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup],
+    link: [userGroups, clientDatabase, lambdaLogGroup, region],
     handler: "packages/functions/src/agent/updateclient.handler",
   },
   routeMetadata

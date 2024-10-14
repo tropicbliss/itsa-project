@@ -7,7 +7,7 @@ import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./database/validators";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { NotFoundError } from "@itsa-project/core/errors/visibleError";
+import { NotFoundError } from "@itsa-project/core/errors";
 
 const s3Client = new S3Client({ region: Resource.Region.name });
 

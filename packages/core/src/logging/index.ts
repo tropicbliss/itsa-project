@@ -39,18 +39,14 @@ export namespace Log {
     });
   }
 
-  export async function sendEmail(
-    data: {
-      recipient: string;
-      status: "sent" | "failed";
-    },
-    timestamp: string
-  ) {
-    await logRaw(
-      Resource.CommunicationLogGroup.name,
-      { type: "email", ...data },
-      new Date(timestamp)
-    );
+  export async function sendEmail(data: {
+    recipient: string;
+    status: "sent" | "failed";
+  }) {
+    await logRaw(Resource.CommunicationLogGroup.name, {
+      type: "email",
+      ...data,
+    });
   }
 
   type Common = {
@@ -118,7 +114,7 @@ export namespace Log {
   }
 }
 
-async function logRaw(groupName: string, data: object, timestamp?: Date) {
+async function logRaw(groupName: string, data: object) {
   const LOG_STREAM_NAME = "main";
   await client.send(
     new CreateLogStreamCommand({
@@ -143,7 +139,7 @@ async function logRaw(groupName: string, data: object, timestamp?: Date) {
       logEvents: [
         {
           message: JSON.stringify(data),
-          timestamp: (timestamp ?? new Date()).getTime(),
+          timestamp: new Date().getTime(),
         },
       ],
       sequenceToken,

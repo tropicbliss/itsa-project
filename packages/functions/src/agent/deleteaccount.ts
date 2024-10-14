@@ -5,7 +5,7 @@ import { db } from "./database/drizzle";
 import { account, client } from "./database/schema.sql";
 import { and, eq } from "drizzle-orm";
 import { clientIdSchema } from "./database/validators";
-import { VisibleError } from "@itsa-project/core/errors/visibleError";
+import { VisibleError } from "@itsa-project/core/errors";
 
 const schema = z.object({
   id: clientIdSchema,

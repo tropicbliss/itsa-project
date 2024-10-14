@@ -30,9 +30,13 @@ declare module "sst" {
       "sender": string
       "type": "sst.aws.Email"
     }
-    "EmailTopic": {
+    "EmailSenderKey": {
       "arn": string
-      "type": "sst.aws.SnsTopic"
+      "type": "aws.kms/key.Key"
+    }
+    "EmailSenderKeyAlias": {
+      "alias": string
+      "type": "aws.kms/alias.Alias"
     }
     "Frontend": {
       "type": "sst.aws.StaticSite"

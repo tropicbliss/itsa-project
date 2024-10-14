@@ -12,7 +12,7 @@ import {
   openingDateSchema,
 } from "./database/validators";
 import { and, eq } from "drizzle-orm";
-import { VisibleError } from "@itsa-project/core/errors/visibleError";
+import { VisibleError } from "@itsa-project/core/errors";
 
 const schema = z.object({
   clientId: clientIdSchema,

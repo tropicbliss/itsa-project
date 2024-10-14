@@ -178,9 +178,11 @@ export function DataTableDemo() {
   return (
     <Button
       onClick={async () => {
-        const res = await put("/admin/user", {
-          id: "21e3d21b-1f5e-4e10-a2ce-fbc3cb2adc44",
-          firstName: "bitch"
+        const res = await post("/admin/user", {
+          email: "tropicbliss416@gmail.com",
+          firstName: "Ben",
+          lastName: "Eater",
+          role: "agent"
         });
         console.log(res)
       }}

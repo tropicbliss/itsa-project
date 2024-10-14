@@ -17,7 +17,7 @@ import {
   stateSchema,
 } from "./database/validators";
 import { eq } from "drizzle-orm";
-import { VisibleError } from "@itsa-project/core/errors/visibleError";
+import { VisibleError } from "@itsa-project/core/errors";
 import { Log } from "@itsa-project/core/logging";
 
 const schema = z
