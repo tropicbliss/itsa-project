@@ -54,10 +54,10 @@ new aws.ses.IdentityNotificationTopic("FailureSnsNotification", {
   topicArn: emailTopic.arn,
 });
 
-// emailTopic.subscribe({
-//   handler: "",
-//   link: [communicationLogGroup]
-// });
+emailTopic.subscribe({
+  handler: "packages/functions/src/email/emaillogging.handler",
+  link: [communicationLogGroup],
+});
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
@@ -160,14 +160,14 @@ const mainframeSecrets = Object.values({
   password: new sst.Secret("MainframePassword"),
 });
 
-// export const transactionImportCron = new sst.aws.Cron("TransactionImportCron", {
-//   schedule: "rate(18 minutes)",
-//   job: {
-//     handler: "packages/functions/src/agent/crontransactions.handler",
-//     timeout: "15 minutes",
-//     link: [clientDatabase, ...mainframeSecrets],
-//   },
-// });
+export const transactionImportCron = new sst.aws.Cron("TransactionImportCron", {
+  schedule: "rate(18 minutes)",
+  job: {
+    handler: "packages/functions/src/agent/crontransactions.handler",
+    timeout: "15 minutes",
+    link: [clientDatabase, ...mainframeSecrets],
+  },
+});
 
 const routeMetadata = {
   auth: {
