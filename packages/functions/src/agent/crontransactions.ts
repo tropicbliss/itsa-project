@@ -15,7 +15,7 @@ const schema = z.object({
   accountId: z.string().uuid(),
   type: z.enum(["D", "W"]),
   amount: initialDepositSchema.transform((num) => num.toString()),
-  date: z.string().datetime(),
+  date: z.string().date(),
   status: z.enum(["completed", "pending", "failed"]),
 });
 
