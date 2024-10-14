@@ -9,7 +9,7 @@ import { z } from "zod";
 import { db } from "../agent/database/drizzle";
 import { client } from "../agent/database/schema.sql";
 import { eq } from "drizzle-orm";
-import { VisibleError } from "@itsa-project/core/errors/visibleError";
+import { VisibleError } from "@itsa-project/core/errors";
 
 const schema = z.object({
   id: z.string().uuid(),

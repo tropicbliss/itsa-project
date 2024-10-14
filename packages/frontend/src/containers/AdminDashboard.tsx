@@ -41,7 +41,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { del, get } from "@/lib/fetchLib";
+import { del, get, post, put } from "@/lib/fetchLib";
 
 const data: Payment[] = [
   {
@@ -178,9 +178,11 @@ export function DataTableDemo() {
   return (
     <Button
       onClick={async () => {
-        await del("/agent/client", {
-          id: "eb42289b-e0f5-4de4-ac77-26b2fd043733",
+        const res = await put("/admin/user", {
+          id: "21e3d21b-1f5e-4e10-a2ce-fbc3cb2adc44",
+          firstName: "bitch"
         });
+        console.log(res)
       }}
     >
       Send

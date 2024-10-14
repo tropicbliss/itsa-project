@@ -21,3 +21,27 @@ export async function del(path: string, payload: object): Promise<unknown> {
   });
   return res;
 }
+
+export async function post(path: string, payload: object): Promise<unknown> {
+  const session = await Auth.currentSession();
+  const res = await API.post("api", path, {
+    body: payload,
+    headers: {
+      Authorization: `Bearer ${session.getAccessToken().getJwtToken()}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+}
+
+export async function put(path: string, payload: object): Promise<unknown> {
+  const session = await Auth.currentSession();
+  const res = await API.put("api", path, {
+    body: payload,
+    headers: {
+      Authorization: `Bearer ${session.getAccessToken().getJwtToken()}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+}

@@ -66,7 +66,7 @@ export const handler = Util.handler(
       const usersInAdminRole = await getUsersInGroup(Resource.UserGroups.admin);
       for (const attribute of usersInAdminRole) {
         const user = getUserFromResponse(attribute, Resource.UserGroups.admin);
-        if (user.id === userId) {
+        if (user.id !== userId) {
           users.push(user);
         }
       }

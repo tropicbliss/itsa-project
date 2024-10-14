@@ -1,5 +1,5 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { NotFoundError, VisibleError } from "../errors/visibleError";
+import { NotFoundError, VisibleError } from "../errors";
 import { ZodError } from "zod";
 
 export type UtilOptions = {
@@ -7,7 +7,7 @@ export type UtilOptions = {
 };
 
 export type Input = {
-  body: unknown;
+  body?: unknown;
   userGroup: string;
   userId: string;
 };
@@ -25,7 +25,7 @@ export namespace Util {
       if (isAllowed) {
         try {
           body = await lambda({
-            body: JSON.parse(event.body!),
+            body: event.body && JSON.parse(event.body),
             userGroup: userInGroup,
             userId: event.requestContext.authorizer!.jwt.claims.username,
           });

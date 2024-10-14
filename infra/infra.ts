@@ -61,8 +61,8 @@ emailTopic.subscribe({
 
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
-  mfa: "on",
-  softwareToken: true,
+  // mfa: "on",
+  // softwareToken: true,
 });
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
@@ -131,7 +131,7 @@ export const userGroups = new sst.Linkable("UserGroups", {
 });
 
 const rootAdminUser = new aws.cognito.User("rootAdminUser", {
-  username: "rootadmin",
+  username: "2b8d14cd-c64e-4c17-93fb-3deaa439f026",
   userPoolId: userPool.id,
   attributes: {
     email_verified: "true",
@@ -166,6 +166,9 @@ export const transactionImportCron = new sst.aws.Cron("TransactionImportCron", {
     handler: "packages/functions/src/agent/crontransactions.handler",
     timeout: "15 minutes",
     link: [clientDatabase, ...mainframeSecrets],
+    nodejs: {
+      install: ["ssh2-sftp-client"],
+    },
   },
 });
 
