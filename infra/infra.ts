@@ -40,25 +40,6 @@ export const email = new sst.aws.Email("Email", {
   sender: rootUserSecrets.email.value,
 });
 
-// export const emailTopic = new sst.aws.SnsTopic("EmailTopic");
-
-// new aws.ses.IdentityNotificationTopic("SuccessSnsNotification", {
-//   identity: email.sender,
-//   notificationType: "Delivery",
-//   topicArn: emailTopic.arn,
-// });
-
-// new aws.ses.IdentityNotificationTopic("FailureSnsNotification", {
-//   identity: email.sender,
-//   notificationType: "Bounce",
-//   topicArn: emailTopic.arn,
-// });
-
-// emailTopic.subscribe({
-//   handler: "packages/functions/src/email/emaillogging.handler",
-//   link: [communicationLogGroup],
-// });
-
 Linkable.wrap(aws.kms.Key, (kmsKey) => ({
   properties: { arn: kmsKey.arn },
   include: [
