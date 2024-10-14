@@ -23,6 +23,10 @@ declare module "sst" {
       "name": string
       "type": "aws.cloudwatch/logGroup.LogGroup"
     }
+    "CommunicationLogStream": {
+      "name": string
+      "type": "aws.cloudwatch/logStream.LogStream"
+    }
     "DatabaseVPC": {
       "type": "sst.aws.Vpc"
     }
@@ -49,6 +53,10 @@ declare module "sst" {
     "LambdaLogGroup": {
       "name": string
       "type": "aws.cloudwatch/logGroup.LogGroup"
+    }
+    "LambdaLogStream": {
+      "name": string
+      "type": "aws.cloudwatch/logStream.LogStream"
     }
     "MainframeIpAddress": {
       "type": "sst.sst.Secret"

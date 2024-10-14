@@ -1,7 +1,6 @@
 import {
   CloudWatchLogsClient,
   PutLogEventsCommand,
-  CreateLogStreamCommand,
   DescribeLogStreamsCommand,
 } from "@aws-sdk/client-cloudwatch-logs";
 import { Resource } from "sst";
@@ -43,10 +42,14 @@ export namespace Log {
     recipient: string;
     status: "sent" | "failed";
   }) {
-    await logRaw(Resource.CommunicationLogGroup.name, {
-      type: "email",
-      ...data,
-    });
+    await logRaw(
+      Resource.CommunicationLogGroup.name,
+      Resource.CommunicationLogStream.name,
+      {
+        type: "email",
+        ...data,
+      }
+    );
   }
 
   type Common = {
@@ -83,7 +86,6 @@ export namespace Log {
   } & Common;
 
   async function logLambdaRaw(data: Data) {
-    const logGroup = Resource.LambdaLogGroup.name;
     let output: Output;
     switch (data.crud) {
       case "update":
@@ -110,22 +112,19 @@ export namespace Log {
           clientId: data.clientId,
         };
     }
-    await logRaw(Resource.LambdaLogGroup.name, output);
+    await logRaw(
+      Resource.LambdaLogGroup.name,
+      Resource.LambdaLogStream.name,
+      output
+    );
   }
 }
 
-async function logRaw(groupName: string, data: object) {
-  const LOG_STREAM_NAME = "main";
-  await client.send(
-    new CreateLogStreamCommand({
-      logGroupName: groupName,
-      logStreamName: LOG_STREAM_NAME,
-    })
-  );
+async function logRaw(groupName: string, streamName: string, data: object) {
   const { logStreams } = await client.send(
     new DescribeLogStreamsCommand({
       logGroupName: groupName,
-      logStreamNamePrefix: LOG_STREAM_NAME,
+      logStreamNamePrefix: streamName,
     })
   );
   const sequenceToken =
@@ -135,7 +134,7 @@ async function logRaw(groupName: string, data: object) {
   await client.send(
     new PutLogEventsCommand({
       logGroupName: groupName,
-      logStreamName: LOG_STREAM_NAME,
+      logStreamName: streamName,
       logEvents: [
         {
           message: JSON.stringify(data),

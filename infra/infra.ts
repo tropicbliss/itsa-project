@@ -13,14 +13,14 @@ Linkable.wrap(aws.cloudwatch.LogGroup, (logGroup) => ({
   properties: { name: logGroup.name },
   include: [
     sst.aws.permission({
-      actions: [
-        "logs:DescribeLogStreams",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-      ],
+      actions: ["logs:DescribeLogStreams", "logs:PutLogEvents"],
       resources: ["*"],
     }),
   ],
+}));
+
+Linkable.wrap(aws.cloudwatch.LogStream, (logStream) => ({
+  properties: { name: logStream.name },
 }));
 
 const lambdaLogGroup = new aws.cloudwatch.LogGroup("LambdaLogGroup", {
@@ -28,11 +28,24 @@ const lambdaLogGroup = new aws.cloudwatch.LogGroup("LambdaLogGroup", {
   retentionInDays: 0,
 });
 
+const lambdaLogStream = new aws.cloudwatch.LogStream("LambdaLogStream", {
+  logGroupName: lambdaLogGroup.name,
+  name: "main",
+});
+
 const communicationLogGroup = new aws.cloudwatch.LogGroup(
   "CommunicationLogGroup",
   {
     name: "communication",
     retentionInDays: 0,
+  }
+);
+
+const communicationLogStream = new aws.cloudwatch.LogStream(
+  "CommunicationLogStream",
+  {
+    logGroupName: communicationLogGroup.name,
+    name: "main",
   }
 );
 
@@ -73,6 +86,7 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
         rootUserSecrets.email,
         communicationLogGroup,
         region,
+        communicationLogStream,
       ],
     },
     kmsKey: kmsKey.arn as any,
@@ -244,7 +258,7 @@ api.route(
 api.route(
   "DELETE /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup, region],
+    link: [userGroups, clientDatabase, lambdaLogGroup, region, lambdaLogStream],
     handler: "packages/functions/src/agent/deleteclient.handler",
   },
   routeMetadata
@@ -271,7 +285,14 @@ api.route(
 api.route(
   "GET /agent/client",
   {
-    link: [userGroups, clientDatabase, bucket, lambdaLogGroup, region],
+    link: [
+      userGroups,
+      clientDatabase,
+      bucket,
+      lambdaLogGroup,
+      region,
+      lambdaLogStream,
+    ],
     handler: "packages/functions/src/agent/getclient.handler",
   },
   routeMetadata
@@ -280,7 +301,7 @@ api.route(
 api.route(
   "POST /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup, region],
+    link: [userGroups, clientDatabase, lambdaLogGroup, region, lambdaLogStream],
     handler: "packages/functions/src/agent/createclient.handler",
   },
   routeMetadata
@@ -289,7 +310,7 @@ api.route(
 api.route(
   "PUT /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup, region],
+    link: [userGroups, clientDatabase, lambdaLogGroup, region, lambdaLogStream],
     handler: "packages/functions/src/agent/updateclient.handler",
   },
   routeMetadata
