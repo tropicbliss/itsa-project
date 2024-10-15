@@ -27,9 +27,11 @@ export const LoginTotpContainer: React.FC<ComponentProps> = ({ user }) => {
     const { toast } = useToast();
 
     const [verificationCode, setVerificationCode] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
     async function handleSubmit() {
         try {
+            setIsLoading(true)
             await Auth.confirmSignIn(user, verificationCode, "SOFTWARE_TOKEN_MFA")
             $authStatus.set({ status: "authenticated" })
         } catch (error) {
@@ -39,6 +41,8 @@ export const LoginTotpContainer: React.FC<ComponentProps> = ({ user }) => {
                 title: "An error occurred verifying the TOTP verification code",
                 description: errorDescription,
             });
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -70,7 +74,7 @@ export const LoginTotpContainer: React.FC<ComponentProps> = ({ user }) => {
             </CardContent>
             <CardFooter>
                 <Button
-                    disabled={verificationCode.length !== 6} type="submit" className="w-full"
+                    disabled={verificationCode.length !== 6 || isLoading} type="submit" className="w-full"
                 >
                     Sign in
                 </Button>

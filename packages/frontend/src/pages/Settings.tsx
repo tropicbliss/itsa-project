@@ -142,6 +142,7 @@ function MFASettings() {
   const { toast } = useToast();
 
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     Auth.currentAuthenticatedUser().then((user) => Auth.getPreferredMFA(user)).then((mfa) => setIsEnabled(mfa !== "NOMFA"))
@@ -153,10 +154,25 @@ function MFASettings() {
         <CardTitle>Disable MFA</CardTitle>
       </CardHeader>
       <CardFooter className="border-t px-6 py-4">
-        <Button onClick={async () => {
-          const user = await Auth.currentAuthenticatedUser();
-          await Auth.setPreferredMFA(user, "NOMFA")
-          setIsEnabled(false)
+        <Button disabled={isLoading} onClick={async () => {
+          try {
+            setIsLoading(true)
+            const user = await Auth.currentAuthenticatedUser();
+            await Auth.setPreferredMFA(user, "NOMFA")
+            setIsEnabled(false)
+            toast({
+              title: "Successfully disabled MFA",
+            });
+          } catch (error) {
+            const errorDescription = extractErrorMessage(error);
+            toast({
+              variant: "destructive",
+              title: "An error occurred disabling MFA",
+              description: errorDescription,
+            });
+          } finally {
+            setIsLoading(false)
+          }
         }}>
           Disable
         </Button>
@@ -168,9 +184,19 @@ function MFASettings() {
         <CardTitle>Set up MFA</CardTitle>
       </CardHeader>
       <CardFooter className="border-t px-6 py-4">
-        <Button onClick={async () => {
-          const user = await Auth.currentAuthenticatedUser();
-          $authStatus.set({ status: "setupTotp", user })
+        <Button disabled={isLoading} onClick={async () => {
+          try {
+            setIsLoading(true)
+            const user = await Auth.currentAuthenticatedUser();
+            $authStatus.set({ status: "setupTotp", user })
+          } catch (error) {
+            const errorDescription = extractErrorMessage(error);
+            toast({
+              variant: "destructive",
+              title: "An error occurred enabling MFA",
+              description: errorDescription,
+            });
+          }
         }}>
           Enable
         </Button>

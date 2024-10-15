@@ -29,9 +29,11 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
 
     const [qrcode, setQrcode] = useState<string | null>(null)
     const [verificationCode, setVerificationCode] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         try {
+            setIsLoading(true)
             Auth.setupTOTP(user).then((code) => {
                 const str = "otpauth://totp/AWSCognito:" + user.username + "?secret=" + code + "&issuer=" + "Global Bank";
                 setQrcode(str)
@@ -43,6 +45,8 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
                 title: "An error occurred fetching the TOTP code",
                 description: errorDescription,
             });
+        } finally {
+            setIsLoading(false)
         }
     }, [])
 
@@ -74,7 +78,7 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
                     Use your favourite authenticator app (e.g., Google Authenticator) to add an extra layer of security to your account.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center gap-3">
+            <CardContent className="flex flex-col items-center gap-9">
                 {qrcode && <QRCodeSVG className="mx-auto dark:invert" value={qrcode} />}
                 <InputOTP maxLength={6} onChange={setVerificationCode}>
                     <InputOTPGroup>
@@ -91,12 +95,12 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
                 </InputOTP>
             </CardContent>
             <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => handleSubmit(true)}
+                <Button variant="outline" disabled={isLoading} onClick={() => handleSubmit(true)}
                 >
                     Skip
                 </Button>
                 <Button type="submit"
-                    disabled={verificationCode.length !== 6}
+                    disabled={verificationCode.length !== 6 || isLoading}
                 >
                     Sign in
                 </Button>
