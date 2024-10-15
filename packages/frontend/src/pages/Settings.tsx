@@ -67,6 +67,7 @@ function ChangePassword() {
       toast({
         title: "Successfully changed password",
       });
+      form.reset()
     } catch (error) {
       const errorDescription = extractErrorMessage(error);
       toast({
