@@ -23,14 +23,15 @@ export const handler: SQSHandler = async (event) => {
       const payload = parsed.data;
       const groupName = payload.group;
       const data = payload.data;
-      const timestamp = new Date(record.attributes.SentTimestamp);
       if (!(groupName in logGroups)) {
         logGroups[groupName] = [];
       }
       logGroups[groupName].push({
         message: JSON.stringify(data),
-        timestamp: timestamp.getTime(),
+        timestamp: Number(record.attributes.SentTimestamp),
       });
+    } else {
+      console.error(parsed.error);
     }
   }
   await Promise.all(

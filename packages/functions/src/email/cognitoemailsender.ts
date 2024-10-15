@@ -57,7 +57,8 @@ export const handler = async (
             recipient: event.request.userAttributes.email,
             status: "sent",
           });
-        } catch {
+        } catch (error) {
+          console.error(error);
           Log.sendEmail({
             recipient: event.request.userAttributes.email,
             status: "failed",

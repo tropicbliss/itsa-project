@@ -56,10 +56,14 @@ export const handler = async (_: any) => {
           `${baseFilePath}/processing/${file}`,
           `${baseFilePath}/processed/${file}`
         );
+      } else {
+        console.error(parsed.error);
       }
     } catch (err) {
       if (!(err instanceof SyntaxError)) {
         throw err;
+      } else {
+        console.error(err);
       }
     }
   }

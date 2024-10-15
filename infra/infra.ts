@@ -98,8 +98,8 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   aliases: ["email"],
   triggers: {
     customEmailSender: {
-      handler: "packages/functions/src/email/emaillogging.handler",
-      link: [email, kmsKey, keyAlias, loggingQueue],
+      handler: "packages/functions/src/email/cognitoemailsender.handler",
+      link: [email, kmsKey, keyAlias, loggingQueue, rootUserSecrets.email],
     },
     kmsKey: kmsKey.arn as any,
   },
