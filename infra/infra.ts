@@ -50,16 +50,24 @@ const communicationLogStream = new aws.cloudwatch.LogStream(
 );
 
 export const loggingQueue = new sst.aws.Queue("LoggingQueue");
-loggingQueue.subscribe({
-  handler: "packages/functions/src/logging/logging.handler",
-  link: [
-    lambdaLogGroup,
-    lambdaLogStream,
-    communicationLogGroup,
-    communicationLogStream,
-    region,
-  ],
-});
+loggingQueue.subscribe(
+  {
+    handler: "packages/functions/src/logging/logging.handler",
+    link: [
+      lambdaLogGroup,
+      lambdaLogStream,
+      communicationLogGroup,
+      communicationLogStream,
+      region,
+    ],
+  },
+  {
+    batch: {
+      size: 25,
+      window: "20 seconds",
+    },
+  }
+);
 
 export const email = new sst.aws.Email("Email", {
   sender: rootUserSecrets.email.value,

@@ -33,11 +33,11 @@ export const handler: SQSHandler = async (event) => {
       });
     }
   }
-  for (const groupName in logGroups) {
-    if (logGroups.hasOwnProperty(groupName)) {
-      await logRaw(groupName, "main", logGroups[groupName]);
-    }
-  }
+  await Promise.all(
+    Object.entries(logGroups).map(([groupName, data]) =>
+      logRaw(groupName, "main", data)
+    )
+  );
 };
 
 async function logRaw(
