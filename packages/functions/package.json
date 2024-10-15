@@ -12,7 +12,6 @@
     "@aws-sdk/lib-dynamodb": "^3.669.0",
     "@aws-sdk/s3-request-presigner": "^3.669.0",
     "@itsa-project/core": "*",
-    "@types/ssh2-sftp-client": "^9.0.4",
     "base64-js": "^1.5.1",
     "ssh2-sftp-client": "^11.0.0",
     "sst": "3.1.78",
@@ -20,6 +19,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",
+    "@types/ssh2-sftp-client": "^9.0.4",
     "@types/validator": "^13.12.2"
   }
 }
