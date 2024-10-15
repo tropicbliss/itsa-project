@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { extractErrorMessage } from "@/lib/error";
 import { createForm } from "@/lib/forms";
 import { Auth } from "aws-amplify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import {
   Card,
@@ -21,16 +21,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { $authStatus } from "@/lib/contextLib";
 
 export function Settings() {
   return (
-    <div>
-      <Component />
+    <div className="grid gap-6">
+      <ChangePassword />
+      <MFASettings />
     </div>
   );
 }
 
-function Component() {
+function ChangePassword() {
   const { toast } = useToast();
 
   const formSchema = z
@@ -134,4 +136,45 @@ function Component() {
       </Form>
     </Card>
   );
+}
+
+function MFASettings() {
+  const { toast } = useToast();
+
+  const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    Auth.currentAuthenticatedUser().then((user) => Auth.getPreferredMFA(user)).then((mfa) => setIsEnabled(mfa !== "NOMFA"))
+  }, [])
+
+  if (isEnabled) {
+    return <Card>
+      <CardHeader>
+        <CardTitle>Disable MFA</CardTitle>
+      </CardHeader>
+      <CardFooter className="border-t px-6 py-4">
+        <Button onClick={async () => {
+          const user = await Auth.currentAuthenticatedUser();
+          await Auth.setPreferredMFA(user, "NOMFA")
+          setIsEnabled(false)
+        }}>
+          Disable
+        </Button>
+      </CardFooter>
+    </Card>
+  } else {
+    return <Card>
+      <CardHeader>
+        <CardTitle>Set up MFA</CardTitle>
+      </CardHeader>
+      <CardFooter className="border-t px-6 py-4">
+        <Button onClick={async () => {
+          const user = await Auth.currentAuthenticatedUser();
+          $authStatus.set({ status: "setupTotp", user })
+        }}>
+          Enable
+        </Button>
+      </CardFooter>
+    </Card>
+  }
 }
