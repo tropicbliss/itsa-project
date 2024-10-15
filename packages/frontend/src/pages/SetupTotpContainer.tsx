@@ -89,7 +89,7 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
                     </CardHeader>
                     <CardContent className="flex flex-col items-center gap-3">
                         {qrcode && <TooltipProvider>
-                            <Tooltip>
+                            <Tooltip delayDuration={0}>
                                 <TooltipTrigger>
                                     <QRCodeSVG onClick={async () => {
                                         await navigator.clipboard.writeText(qrcode.raw)
