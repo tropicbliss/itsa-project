@@ -138,15 +138,14 @@ function ChangePassword() {
 function UserProfileSettings() {
   const { toast } = useToast();
 
+  const [isLoading, setIsLoading] = useState(false)
+
   const formSchema = z
     .object({
       email: z.string().email(),
       firstName: z.string().min(1),
       lastName: z.string().min(1),
     });
-
-  const [isLoading, setIsLoading] = useState(false)
-
   const form = createForm(formSchema, {
     email: "",
     firstName: "",
