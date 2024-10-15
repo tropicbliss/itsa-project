@@ -1,11 +1,7 @@
-import {
-  CloudWatchLogsClient,
-  PutLogEventsCommand,
-  DescribeLogStreamsCommand,
-} from "@aws-sdk/client-cloudwatch-logs";
 import { Resource } from "sst";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
-const client = new CloudWatchLogsClient({ region: Resource.Region.name });
+const sqs = new SQSClient({});
 
 export namespace Log {
   export async function createClient(data: Common) {
@@ -42,14 +38,10 @@ export namespace Log {
     recipient: string;
     status: "sent" | "failed";
   }) {
-    await logRaw(
-      Resource.CommunicationLogGroup.name,
-      Resource.CommunicationLogStream.name,
-      {
-        type: "email",
-        ...data,
-      }
-    );
+    await logRaw("communication", {
+      type: "email",
+      ...data,
+    });
   }
 
   type Common = {
@@ -112,36 +104,19 @@ export namespace Log {
           clientId: data.clientId,
         };
     }
-    await logRaw(
-      Resource.LambdaLogGroup.name,
-      Resource.LambdaLogStream.name,
-      output
-    );
+    await logRaw("lambda", output);
   }
 }
 
-async function logRaw(groupName: string, streamName: string, data: object) {
-  const { logStreams } = await client.send(
-    new DescribeLogStreamsCommand({
-      logGroupName: groupName,
-      logStreamNamePrefix: streamName,
-    })
-  );
-  const sequenceToken =
-    logStreams && logStreams.length > 0
-      ? logStreams[0].uploadSequenceToken
-      : undefined;
-  await client.send(
-    new PutLogEventsCommand({
-      logGroupName: groupName,
-      logStreamName: streamName,
-      logEvents: [
-        {
-          message: JSON.stringify(data),
-          timestamp: new Date().getTime(),
-        },
-      ],
-      sequenceToken,
+async function logRaw(groupName: string, data: object) {
+  const payload = {
+    group: groupName,
+    data,
+  };
+  await sqs.send(
+    new SendMessageCommand({
+      QueueUrl: Resource.LoggingQueue.url,
+      MessageBody: JSON.stringify(payload),
     })
   );
 }

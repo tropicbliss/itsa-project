@@ -49,6 +49,18 @@ const communicationLogStream = new aws.cloudwatch.LogStream(
   }
 );
 
+export const loggingQueue = new sst.aws.Queue("LoggingQueue");
+loggingQueue.subscribe({
+  handler: "packages/functions/src/logging/logging.handler",
+  link: [
+    lambdaLogGroup,
+    lambdaLogStream,
+    communicationLogGroup,
+    communicationLogStream,
+    region,
+  ],
+});
+
 export const email = new sst.aws.Email("Email", {
   sender: rootUserSecrets.email.value,
 });
@@ -79,15 +91,7 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
   triggers: {
     customEmailSender: {
       handler: "packages/functions/src/email/emaillogging.handler",
-      link: [
-        email,
-        kmsKey,
-        keyAlias,
-        rootUserSecrets.email,
-        communicationLogGroup,
-        region,
-        communicationLogStream,
-      ],
+      link: [email, kmsKey, keyAlias, loggingQueue],
     },
     kmsKey: kmsKey.arn as any,
   },
@@ -258,7 +262,7 @@ api.route(
 api.route(
   "DELETE /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup, region, lambdaLogStream],
+    link: [userGroups, clientDatabase, loggingQueue],
     handler: "packages/functions/src/agent/deleteclient.handler",
   },
   routeMetadata
@@ -285,14 +289,7 @@ api.route(
 api.route(
   "GET /agent/client",
   {
-    link: [
-      userGroups,
-      clientDatabase,
-      bucket,
-      lambdaLogGroup,
-      region,
-      lambdaLogStream,
-    ],
+    link: [userGroups, clientDatabase, bucket, loggingQueue],
     handler: "packages/functions/src/agent/getclient.handler",
   },
   routeMetadata
@@ -301,7 +298,7 @@ api.route(
 api.route(
   "POST /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup, region, lambdaLogStream],
+    link: [userGroups, clientDatabase, loggingQueue],
     handler: "packages/functions/src/agent/createclient.handler",
   },
   routeMetadata
@@ -310,7 +307,7 @@ api.route(
 api.route(
   "PUT /agent/client",
   {
-    link: [userGroups, clientDatabase, lambdaLogGroup, region, lambdaLogStream],
+    link: [userGroups, clientDatabase, loggingQueue],
     handler: "packages/functions/src/agent/updateclient.handler",
   },
   routeMetadata

@@ -63,6 +63,10 @@ declare module "sst" {
       "name": string
       "type": "aws.cloudwatch/logStream.LogStream"
     }
+    "LoggingQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
     "MainframeIpAddress": {
       "type": "sst.sst.Secret"
       "value": string
