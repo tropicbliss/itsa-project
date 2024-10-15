@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useAppContext } from "@/lib/contextLib";
 import { Auth } from "aws-amplify";
 import { Link, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -12,14 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CircleUser, Menu, DollarSignIcon } from "lucide-react";
+import { $authStatus } from "@/lib/contextLib";
 
 export function Navbar() {
-  const { userHasAuthenticated } = useAppContext();
   const navigate = useNavigate();
 
   async function handleLogout() {
     await Auth.signOut();
-    userHasAuthenticated(false);
+    $authStatus.set({status: "unauthenticated"})
     navigate("/");
   }
 

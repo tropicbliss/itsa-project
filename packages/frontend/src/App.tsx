@@ -1,32 +1,28 @@
-import { useEffect, useState } from "react";
-import { AppContext, AppContextType } from "./lib/contextLib";
+import { useEffect } from "react";
 import Routes from "./Routes.tsx";
 import { LoginForm } from "./pages/LoginContainer";
 import { Navbar } from "./containers/Navbar.tsx";
 import { Auth } from "aws-amplify";
+import { $authStatus } from "./lib/contextLib.ts";
+import { useStore } from '@nanostores/react'
 
 export function App() {
-  const [isAuthenticated, userHasAuthenticated] = useState(false);
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const authStatus = useStore($authStatus)
 
   useEffect(() => {
     Auth.currentSession()
-      .then(() => userHasAuthenticated(true))
-      .catch(() => {})
-      .finally(() => setIsAuthenticating(false));
+      .then(() => $authStatus.set({status: "authenticated"}))
+      .catch(() => $authStatus.set({status: "unauthenticated"}))
   }, []);
 
-  if (isAuthenticating) {
-    return <></>;
+  switch (authStatus.status) {
+    case "authenticated":
+      return <AuthorizedWrapper />
+    case "unauthenticated":
+      return <LoginForm />
+    default:
+      return <></>
   }
-
-  return (
-    <AppContext.Provider
-      value={{ isAuthenticated, userHasAuthenticated } as AppContextType}
-    >
-      {isAuthenticated ? <AuthorizedWrapper /> : <LoginForm />}
-    </AppContext.Provider>
-  );
 }
 
 function AuthorizedWrapper() {

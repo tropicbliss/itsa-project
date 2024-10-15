@@ -17,11 +17,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useAppContext } from "@/lib/contextLib";
 import { extractErrorMessage } from "@/lib/error";
 import { createForm } from "@/lib/forms";
 import { Auth } from "aws-amplify";
 import { z } from "zod";
+import { $authStatus } from "@/lib/contextLib";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -32,7 +32,6 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const { toast } = useToast();
-  const { userHasAuthenticated } = useAppContext();
 
   const form = createForm(formSchema, {
     email: "",
@@ -41,8 +40,12 @@ export function LoginForm() {
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await Auth.signIn(values.email, values.password);
-      userHasAuthenticated(true);
+      const user = await Auth.signIn(values.email, values.password);
+      if (user.challengeName === "NEW_PASSWORD_REQUIRED") {
+        $authStatus.set({status: "forceChangePassword", email: values.email})
+      } else {
+        $authStatus.set({status: "authenticated"})
+      }
     } catch (error) {
       const errorDescription = extractErrorMessage(error);
       toast({

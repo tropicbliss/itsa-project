@@ -1,15 +1,6 @@
-import { createContext, useContext } from "react";
+import { atom } from "nanostores";
 
-export interface AppContextType {
-    isAuthenticated: boolean;
-    userHasAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export const AppContext = createContext<AppContextType>({
-    isAuthenticated: false,
-    userHasAuthenticated: useAppContext,
-});
-
-export function useAppContext() {
-    return useContext(AppContext);
-}
+export const $authStatus = atom<
+  | { status: "unauthenticated" | "loading" | "authenticated" }
+  | { status: "forceChangePassword"; email: string }
+>({ status: "loading" });

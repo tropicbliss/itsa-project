@@ -91,8 +91,8 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
     },
     kmsKey: kmsKey.arn as any,
   },
-  // mfa: "on",
-  // softwareToken: true,
+  mfa: "optional",
+  softwareToken: true,
 });
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
