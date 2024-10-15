@@ -34,7 +34,7 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
     useEffect(() => {
         setIsLoading(true)
         Auth.setupTOTP(user).then((code) => {
-            const str = "otpauth://totp/AWSCognito:" + user.username + "?secret=" + code + "&issuer=" + "Global Bank";
+            const str = "otpauth://totp/AWSCognito:" + user.username + "?secret=" + code + "&issuer=" + "MU-FinTech-ITM";
             setQrcode(str)
         }).catch((error) => {
             const errorDescription = extractErrorMessage(error);
