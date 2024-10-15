@@ -5,6 +5,7 @@ import {
   AdminListGroupsForUserCommand,
   AdminUpdateUserAttributesCommand,
   type AttributeType,
+  AdminSetUserPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { z } from "zod";
 import { VisibleError } from "@itsa-project/core/errors";
@@ -14,6 +15,7 @@ const schema = z.object({
   email: z.string().email().optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
+  password: z.string().min(1).optional(),
 });
 
 const client = new CognitoIdentityProviderClient({
@@ -79,5 +81,15 @@ export const handler = Util.handler(
       input.firstName,
       input.lastName
     );
+    if (input.password) {
+      await client.send(
+        new AdminSetUserPasswordCommand({
+          Password: input.password,
+          Username: input.id,
+          UserPoolId: Resource.UserPool.id,
+          Permanent: true,
+        })
+      );
+    }
   }
 );
