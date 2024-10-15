@@ -18,17 +18,20 @@ const client = new CloudWatchLogsClient({ region: Resource.Region.name });
 export const handler: SQSHandler = async (event) => {
   const logGroups: Record<string, InputLogEvent[]> = {};
   for (const record of event.Records) {
-    const payload = schema.parse(JSON.parse(record.body));
-    const groupName = payload.group;
-    const data = payload.data;
-    const timestamp = new Date(record.attributes.SentTimestamp);
-    if (!(groupName in logGroups)) {
-      logGroups[groupName] = [];
+    const parsed = schema.safeParse(JSON.parse(record.body));
+    if (parsed.success) {
+      const payload = parsed.data;
+      const groupName = payload.group;
+      const data = payload.data;
+      const timestamp = new Date(record.attributes.SentTimestamp);
+      if (!(groupName in logGroups)) {
+        logGroups[groupName] = [];
+      }
+      logGroups[groupName].push({
+        message: JSON.stringify(data),
+        timestamp: timestamp.getTime(),
+      });
     }
-    logGroups[groupName].push({
-      message: JSON.stringify(data),
-      timestamp: timestamp.getTime(),
-    });
   }
   for (const groupName in logGroups) {
     if (logGroups.hasOwnProperty(groupName)) {
