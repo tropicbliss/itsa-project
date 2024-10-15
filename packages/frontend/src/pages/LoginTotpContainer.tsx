@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { $authStatus } from "@/lib/contextLib";
-import { QRCodeSVG } from 'qrcode.react';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Auth } from "aws-amplify";
 import { extractErrorMessage } from "@/lib/error";
 import { useToast } from "@/hooks/use-toast";
