@@ -42,9 +42,11 @@ export function LoginForm() {
     try {
       const user = await Auth.signIn(values.email, values.password);
       if (user.challengeName === "NEW_PASSWORD_REQUIRED") {
-        $authStatus.set({status: "forceChangePassword", email: values.email})
+        $authStatus.set({ status: "forceChangePassword", user })
+      } else if (user.challengeName === "SOFTWARE_TOKEN_MFA") {
+        $authStatus.set({ status: "verifyTotp", user })
       } else {
-        $authStatus.set({status: "authenticated"})
+        $authStatus.set({ status: "authenticated" })
       }
     } catch (error) {
       const errorDescription = extractErrorMessage(error);
