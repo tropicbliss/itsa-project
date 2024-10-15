@@ -27,6 +27,7 @@ export function Settings() {
   return (
     <div className="grid gap-6">
       <ChangePassword />
+      <UserProfileSettings />
       <MFASettings />
     </div>
   );
@@ -57,10 +58,7 @@ function ChangePassword() {
     confirmPassword: "",
   });
 
-  const [loading, setLoading] = useState(false);
-
   async function handleSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
     try {
       const user = await Auth.currentAuthenticatedUser();
       await Auth.changePassword(user, values.oldPassword, values.newPassword);
@@ -75,8 +73,6 @@ function ChangePassword() {
         title: "An error occurred resetting the password",
         description: errorDescription,
       });
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -129,8 +125,132 @@ function ChangePassword() {
             />
           </CardContent>
           <CardFooter className="border-t px-6 py-4">
-            <Button disabled={loading} type="submit">
+            <Button disabled={form.formState.isSubmitting} type="submit">
               Reset Password
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
+    </Card>
+  );
+}
+
+function UserProfileSettings() {
+  const { toast } = useToast();
+
+  const formSchema = z
+    .object({
+      email: z.string().email(),
+      firstName: z.string().min(1),
+      lastName: z.string().min(1),
+    });
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  const form = createForm(formSchema, {
+    email: "",
+    firstName: "",
+    lastName: ""
+  });
+
+  useEffect(() => {
+    setIsLoading(true)
+    try {
+      Auth.currentAuthenticatedUser().then((user) => Auth.userAttributes(user)).then((attributes) => {
+        const email = attributes.find((attribute) => attribute.Name === "email")?.Value
+        const firstName = attributes.find((attribute) => attribute.Name === "given_name")?.Value
+        const lastName = attributes.find((attribute) => attribute.Name === "family_name")?.Value
+        if (email === undefined || firstName === undefined || lastName === undefined) {
+          throw new Error("A required attribute is not found")
+        }
+        form.setValue("email", email)
+        form.setValue("firstName", firstName)
+        form.setValue("lastName", lastName)
+      })
+    } catch (error) {
+      const errorDescription = extractErrorMessage(error);
+      toast({
+        variant: "destructive",
+        title: "An error occurred fetching user attributes",
+        description: errorDescription,
+      });
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  async function handleSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      await Auth.updateUserAttributes(user, {
+        email: values.email,
+        "given_name": values.firstName,
+        "family_name": values.lastName,
+      })
+      toast({
+        title: "Successfully updated user profile",
+      });
+    } catch (error) {
+      const errorDescription = extractErrorMessage(error);
+      toast({
+        variant: "destructive",
+        title: "An error occurred updating user profile",
+        description: errorDescription,
+      });
+    }
+  }
+
+  return (
+    <Card>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <CardHeader>
+            <CardTitle>Update User Profile</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="grid gap-3">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem className="grid gap-3">
+                  <FormLabel>First name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem className="grid gap-3">
+                  <FormLabel>Last name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <CardFooter className="border-t px-6 py-4">
+            <Button disabled={form.formState.isSubmitting || isLoading} type="submit">
+              Update
             </Button>
           </CardFooter>
         </form>
