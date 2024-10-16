@@ -6,16 +6,16 @@ import { account, client, transactions } from "./database/schema.sql";
 import { db } from "./database/drizzle";
 
 const schema = z.object({
-  page: z.number().int().positive(),
-  limit: z.number().int().positive(),
+  page: z.coerce.number().int().positive(),
+  limit: z.coerce.number().int().positive(),
 });
 
 export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.agent],
   },
-  async ({ userId, body }) => {
-    const input = schema.parse(body);
+  async ({ userId, queryParams }) => {
+    const input = schema.parse(queryParams);
     const offset = (input.page - 1) * input.limit;
     const txnInformation = await db
       .select({ transactions })

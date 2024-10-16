@@ -31,7 +31,7 @@ export const handler: SQSHandler = async (event) => {
         timestamp: Number(record.attributes.SentTimestamp),
       });
     } else {
-      console.error(parsed.error);
+      console.warn(`Parsing error: ${parsed.error}`);
     }
   }
   await Promise.all(

@@ -1,5 +1,10 @@
-import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { NotFoundError, VisibleError } from "../errors";
+import {
+  Context,
+  APIGatewayProxyEvent,
+  APIGatewayProxyEventPathParameters,
+  APIGatewayProxyEventQueryStringParameters,
+} from "aws-lambda";
+import { VisibleError } from "../errors";
 import { ZodError } from "zod";
 
 export type UtilOptions = {
@@ -10,6 +15,7 @@ export type Input = {
   body?: unknown;
   userGroup: string;
   userId: string;
+  queryParams?: APIGatewayProxyEventQueryStringParameters;
 };
 
 export namespace Util {
@@ -28,6 +34,7 @@ export namespace Util {
             body: event.body && JSON.parse(event.body),
             userGroup: userInGroup,
             userId: event.requestContext.authorizer!.jwt.claims.username,
+            queryParams: event.queryStringParameters ?? undefined,
           });
           statusCode = 200;
         } catch (error) {
@@ -36,9 +43,6 @@ export namespace Util {
             body = {
               error: error.message,
             };
-            if (error instanceof NotFoundError) {
-              statusCode = 404;
-            }
           } else if (error instanceof ZodError) {
             const errors = error.errors.map((err) => ({
               path: err.path.join("."),

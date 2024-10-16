@@ -31,6 +31,7 @@ export const handler = async (_: any) => {
   );
   for (const file of fileList) {
     if (!UUID.isValidUUIDJson(file)) {
+      console.warn(`Invalid file name: ${file}`);
       continue;
     }
     const fileContent = (
@@ -57,13 +58,14 @@ export const handler = async (_: any) => {
           `${baseFilePath}/processed/${file}`
         );
       } else {
-        console.error(parsed.error);
+        console.warn(`Failed to parse file: ${parsed.error}`);
       }
     } catch (err) {
       if (!(err instanceof SyntaxError)) {
+        console.warn(`Invalid JSON file: ${file}`);
         throw err;
       } else {
-        console.error(err);
+        console.warn(err);
       }
     }
   }

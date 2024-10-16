@@ -328,7 +328,7 @@ api.route(
 api.route(
   "GET /agent/client",
   {
-    link: [userGroups, clientDatabase, bucket, loggingQueue],
+    link: [userGroups, clientDatabase, bucket, loggingQueue, region],
     handler: "packages/functions/src/agent/getclient.handler",
   },
   routeMetadata
@@ -355,7 +355,7 @@ api.route(
 api.route(
   "POST /agent/verifyclient",
   {
-    link: [userGroups, clientDatabase, bucket],
+    link: [userGroups, clientDatabase, bucket, region],
     handler: "packages/functions/src/agent/verifyclient.handler",
   },
   routeMetadata

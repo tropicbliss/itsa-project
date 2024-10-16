@@ -18,19 +18,21 @@ export const handler = Util.handler(
   async ({ body, userId }) => {
     const input = schema.parse(body);
     await db.transaction(async (tx) => {
-      const isUserAllowedToModifyClient = await tx
+      const isUserAllowedToDeleteAccount = await tx
         .select()
         .from(client)
-        .where(and(eq(client.id, input.id), eq(client.agentId, userId)))
+        .innerJoin(account, eq(account.clientId, client.id))
+        .where(and(eq(client.agentId, userId), eq(account.id, input.id)))
         .limit(1)
         .execute()
         .then((row) => row.length > 0);
-      if (!isUserAllowedToModifyClient) {
+      if (!isUserAllowedToDeleteAccount) {
         throw new VisibleError(
           "User does not have permission to modify this client"
         );
       }
       await tx.delete(account).where(eq(account.id, input.id)).execute();
     });
+    console.log(JSON.stringify(input));
   }
 );

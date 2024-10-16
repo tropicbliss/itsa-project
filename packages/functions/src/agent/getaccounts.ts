@@ -2,7 +2,7 @@ import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { db } from "./database/drizzle";
 import { account, client } from "./database/schema.sql";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export const handler = Util.handler(
   {
@@ -13,7 +13,7 @@ export const handler = Util.handler(
       .select({ account })
       .from(account)
       .innerJoin(client, eq(account.clientId, client.id))
-      .where(and(eq(client.agentId, userId), eq(account.status, "active")))
+      .where(eq(client.agentId, userId))
       .execute();
     return response.map((row) => row.account);
   }

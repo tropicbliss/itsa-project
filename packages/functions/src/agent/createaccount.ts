@@ -46,11 +46,12 @@ export const handler = Util.handler(
         .insert(account)
         .values({
           ...input,
-          status: "active",
+          status: "pending",
         })
         .returning()
         .execute();
     });
+    console.log(JSON.stringify(input));
     return { id: response[0].id };
   }
 );

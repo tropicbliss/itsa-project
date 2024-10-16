@@ -178,11 +178,9 @@ export function DataTableDemo() {
   return (
     <Button
       onClick={async () => {
-        const res = await post("/admin/user", {
-          email: "tropicbliss416@gmail.com",
-          firstName: "Ben",
-          lastName: "Eater",
-          role: "agent"
+        const res = await post("/agent/verifyclient", {
+          clientId: "e9d1b576-0879-4299-ac40-a63397ee18c4",
+          contentType: "image/jpeg"
         });
         console.log(res)
       }}
@@ -276,9 +274,9 @@ export function DataTableDemo() {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}

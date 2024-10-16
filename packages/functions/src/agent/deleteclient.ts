@@ -7,23 +7,22 @@ import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./database/validators";
 import { Log } from "@itsa-project/core/logging";
 
-const schema = z.object({
-  id: clientIdSchema,
-});
-
 export const handler = Util.handler(
   {
     allowedGroups: [Resource.UserGroups.agent],
   },
-  async ({ body, userId }) => {
-    const input = schema.parse(body);
-    await db
+  async ({ userId }) => {
+    const deleted = await db
       .delete(client)
-      .where(and(eq(client.id, input.id), eq(client.agentId, userId)))
-      .execute();
-    await Log.deleteClient({
-      agentId: userId,
-      clientId: input.id,
-    });
+      .where(eq(client.agentId, userId))
+      .returning()
+      .execute()
+      .then((row) => row[0]);
+    if (deleted) {
+      await Log.deleteClient({
+        agentId: userId,
+        clientId: deleted.id,
+      });
+    }
   }
 );

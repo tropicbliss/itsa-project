@@ -7,7 +7,7 @@ import { eq, and } from "drizzle-orm";
 import { clientIdSchema } from "./database/validators";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { NotFoundError } from "@itsa-project/core/errors";
+import { VisibleError } from "@itsa-project/core/errors";
 
 const s3Client = new S3Client({ region: Resource.Region.name });
 
@@ -30,7 +30,7 @@ export const handler = Util.handler(
       .execute()
       .then((result) => result.length > 0);
     if (!clientExists) {
-      throw new NotFoundError("Client id not found");
+      throw new VisibleError("Agent is not responsible for client");
     }
     const command = new PutObjectCommand({
       Bucket: Resource.Uploads.name,
@@ -40,6 +40,7 @@ export const handler = Util.handler(
     const url = await getSignedUrl(s3Client, command, {
       expiresIn: 600,
     });
+    console.log(JSON.stringify(input));
     return { url };
   }
 );
