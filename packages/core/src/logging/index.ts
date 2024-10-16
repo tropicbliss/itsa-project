@@ -81,6 +81,7 @@ export namespace Log {
     let output: Output;
     switch (data.crud) {
       case "update":
+        data.attributes = sortObjectByKeys(data.attributes);
         output = {
           crud: data.crud,
           agentId: data.agentId,
@@ -106,6 +107,15 @@ export namespace Log {
     }
     await logRaw("lambda", output);
   }
+}
+
+function sortObjectByKeys(obj: Record<string, any>) {
+  const sortedKeys = Object.keys(obj).sort();
+  const sortedObj: Record<string, any> = {};
+  sortedKeys.forEach((key) => {
+    sortedObj[key] = obj[key];
+  });
+  return sortedObj;
 }
 
 async function logRaw(groupName: string, data: object) {
