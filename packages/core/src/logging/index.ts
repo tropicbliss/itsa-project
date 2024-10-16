@@ -109,9 +109,9 @@ export namespace Log {
   }
 }
 
-function sortObjectByKeys(obj: Record<string, any>) {
+function sortObjectByKeys<T>(obj: Record<string, T>) {
   const sortedKeys = Object.keys(obj).sort();
-  const sortedObj: Record<string, any> = {};
+  const sortedObj: Record<string, T> = {};
   sortedKeys.forEach((key) => {
     sortedObj[key] = obj[key];
   });
