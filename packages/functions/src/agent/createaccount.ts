@@ -46,7 +46,7 @@ export const handler = Util.handler(
         .insert(account)
         .values({
           ...input,
-          status: "pending",
+          status: "active",
         })
         .returning()
         .execute();
