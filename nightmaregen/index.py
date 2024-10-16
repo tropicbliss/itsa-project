@@ -13,6 +13,7 @@ pending = deque(maxlen=27)
 while True:
     time.sleep(27)
     account_id = None
+    random_status = None
     if random.choice([True, False]):
         with urllib.request.urlopen(url) as response:
             data = response.read().decode("utf-8")
@@ -20,13 +21,14 @@ while True:
     else:
         try:
             account_id = pending.pop()
+            random_status = random.choice(["completed", "failed"])
         except:
             pass
     if account_id != None:
-        random_status = random.choice(["completed", "pending", "failed"])
+        if random_status == None:
+            random_status = random.choice(["completed", "pending", "failed"])
         if random_status == "pending":
             pending.append(account_id)
-            continue
         generated_uuid = str(uuid.uuid4())
         output = {
             "id": generated_uuid,
