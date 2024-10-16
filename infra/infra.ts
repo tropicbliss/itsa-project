@@ -49,7 +49,38 @@ const communicationLogStream = new aws.cloudwatch.LogStream(
   }
 );
 
-export const loggingQueue = new sst.aws.Queue("LoggingQueue");
+const dlqLogGroup = new aws.cloudwatch.LogGroup("DLQLogGroup", {
+  name: "dlq",
+  retentionInDays: 0,
+});
+
+const dlqLogStream = new aws.cloudwatch.LogStream("DLQLogStream", {
+  logGroupName: dlqLogGroup.name,
+  name: "main",
+});
+
+export const loggingDlq = new sst.aws.Queue("LoggingDLQ");
+
+loggingDlq.subscribe(
+  {
+    handler: "packages/functions/src/logging/logging.dlq",
+    link: [region, dlqLogGroup, dlqLogStream],
+  },
+  {
+    batch: {
+      size: 25,
+      window: "20 seconds",
+    },
+  }
+);
+
+export const loggingQueue = new sst.aws.Queue("LoggingQueue", {
+  dlq: {
+    queue: loggingDlq.arn,
+    retry: 3,
+  },
+});
+
 loggingQueue.subscribe(
   {
     handler: "packages/functions/src/logging/logging.handler",

@@ -65,3 +65,19 @@ async function logRaw(
     })
   );
 }
+
+export const dlq: SQSHandler = async (event) => {
+  const logEvents: InputLogEvent[] = [];
+  for (const record of event.Records) {
+    const body = record.body;
+    logEvents.push({
+      message: body,
+      timestamp: Number(record.attributes.SentTimestamp),
+    });
+  }
+  await logRaw(
+    Resource.DLQLogGroup.name,
+    Resource.DLQLogStream.name,
+    logEvents
+  );
+};
