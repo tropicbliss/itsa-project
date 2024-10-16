@@ -16,7 +16,7 @@ while True:
     if random.choice([True, False]):
         with urllib.request.urlopen(url) as response:
             data = response.read().decode("utf-8")
-            account_id = json.loads(data)
+            account_id = json.loads(data)["id"]
     else:
         try:
             account_id = pending.pop()

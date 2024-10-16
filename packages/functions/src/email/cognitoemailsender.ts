@@ -30,6 +30,7 @@ export const handler = async (
           b64.toByteArray(event.request.code)
         );
         const temporaryPassword = plaintext.toString();
+        console.log(temporaryPassword)
         const { given_name } = event.request.userAttributes;
         const message = `Hi ${given_name},\nHere's your temporary password: ${temporaryPassword}`;
         try {

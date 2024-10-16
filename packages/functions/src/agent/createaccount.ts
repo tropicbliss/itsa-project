@@ -29,7 +29,7 @@ export const handler = Util.handler(
   },
   async ({ body, userId }) => {
     const input = schema.parse(body);
-    await db.transaction(async (tx) => {
+    const response = await db.transaction(async (tx) => {
       const isUserAllowedToModifyClient = await tx
         .select()
         .from(client)
@@ -42,13 +42,15 @@ export const handler = Util.handler(
           "User does not have permission to modify this client"
         );
       }
-      await tx
+      return await tx
         .insert(account)
         .values({
           ...input,
           status: "active",
         })
+        .returning()
         .execute();
     });
+    return { id: response[0].id };
   }
 );

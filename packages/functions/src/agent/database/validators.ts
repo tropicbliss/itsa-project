@@ -1,5 +1,4 @@
 import { z } from "zod";
-import isDecimal from "validator/es/lib/isDecimal";
 import isAlpha from "validator/es/lib/isAlpha";
 import isBefore from "validator/es/lib/isBefore";
 import isAfter from "validator/es/lib/isAfter";
@@ -70,7 +69,7 @@ export const phoneNumberSchema = z.string().refine((input) =>
 export const addressSchema = z.string().min(5).max(100);
 export const citySchema = z.string().min(2).max(50);
 export const stateSchema = z.string().min(2).max(50);
-export const countrySchema = z.string().refine(isCountryCode);
+export const countrySchema = z.string().length(2);
 
 export function isPostalCode(input: string, countryCode: string) {
   return isPostalCodeInner(input, countryCode as any);

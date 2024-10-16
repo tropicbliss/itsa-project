@@ -12,5 +12,5 @@ export const handler = async (_: any) => {
   if (randomAccount.length === 0) {
     return null;
   }
-  return randomAccount[0].id;
+  return { id: randomAccount[0].id };
 };

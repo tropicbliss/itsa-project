@@ -64,9 +64,11 @@ export const handler = Util.handler(
         .returning()
         .execute();
     });
+    const clientId = response[0].id;
     await Log.createClient({
       agentId: userId,
-      clientId: response[0].id,
+      clientId,
     });
+    return { id: clientId };
   }
 );
