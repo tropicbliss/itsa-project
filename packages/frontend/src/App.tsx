@@ -8,6 +8,8 @@ import { useStore } from '@nanostores/react'
 import { ForceChangePasswordContainer } from "./pages/ForceChangePasswordContainer.tsx";
 import { SetupTotpContainer } from "./pages/SetupTotpContainer.tsx";
 import { LoginTotpContainer } from "./pages/LoginTotpContainer.tsx";
+import { ForgotPasswordContainer } from "./pages/ForgotPasswordContainer.tsx";
+import { ForgotPasswordSubmitContainer } from "./pages/ForgotPasswordSubmitContainer.tsx";
 
 export function App() {
   const authStatus = useStore($authStatus)
@@ -29,6 +31,10 @@ export function App() {
       return <SetupTotpContainer user={authStatus.user} />
     case "verifyTotp":
       return <LoginTotpContainer user={authStatus.user} />
+    case "forgotPassword":
+      return <ForgotPasswordContainer />
+    case "forgotPasswordSubmit":
+      return <ForgotPasswordSubmitContainer username={authStatus.username} />
     default:
       return <></>
   }

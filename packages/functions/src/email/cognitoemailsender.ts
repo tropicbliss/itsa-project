@@ -1,4 +1,7 @@
-import { type CustomEmailSenderAdminCreateUserTriggerEvent } from "aws-lambda";
+import {
+  type CustomEmailSenderForgotPasswordTriggerEvent,
+  type CustomEmailSenderAdminCreateUserTriggerEvent,
+} from "aws-lambda";
 import {
   buildClient,
   CommitmentPolicy,
@@ -14,26 +17,26 @@ const client = new SESv2Client();
 const { decrypt } = buildClient(CommitmentPolicy.REQUIRE_ENCRYPT_ALLOW_DECRYPT);
 
 export const handler = async (
-  event: CustomEmailSenderAdminCreateUserTriggerEvent
+  event:
+    | CustomEmailSenderAdminCreateUserTriggerEvent
+    | CustomEmailSenderForgotPasswordTriggerEvent
 ) => {
-  switch (event.triggerSource) {
-    case "CustomEmailSender_AdminCreateUser":
-      const generatorKeyId = Resource.EmailSenderKeyAlias.alias;
-      const keyIds = [Resource.EmailSenderKey.arn];
-      const keyring = new KmsKeyringNode({
-        generatorKeyId,
-        keyIds,
-      });
-      if (event.request.code) {
-        const { plaintext } = await decrypt(
-          keyring,
-          b64.toByteArray(event.request.code)
-        );
-        const temporaryPassword = plaintext.toString();
-        console.log(temporaryPassword)
-        const { given_name } = event.request.userAttributes;
-        const message = `Hi ${given_name},\nHere's your temporary password: ${temporaryPassword}`;
-        try {
+  if (event.request.code) {
+    const generatorKeyId = Resource.EmailSenderKeyAlias.alias;
+    const keyIds = [Resource.EmailSenderKey.arn];
+    const keyring = new KmsKeyringNode({
+      generatorKeyId,
+      keyIds,
+    });
+    const { plaintext } = await decrypt(
+      keyring,
+      b64.toByteArray(event.request.code)
+    );
+    const temporaryPassword = plaintext.toString();
+    const { given_name } = event.request.userAttributes;
+    try {
+      switch (event.triggerSource) {
+        case "CustomEmailSender_AdminCreateUser":
           await client.send(
             new SendEmailCommand({
               FromEmailAddress: Resource.RootUserEmail.value,
@@ -47,24 +50,48 @@ export const handler = async (
                   },
                   Body: {
                     Text: {
-                      Data: message,
+                      Data: `Hi ${given_name},\nHere's your temporary password: ${temporaryPassword}`,
                     },
                   },
                 },
               },
             })
           );
-          Log.sendEmail({
-            recipient: event.request.userAttributes.email,
-            status: "sent",
-          });
-        } catch (error) {
-          console.error(error);
-          Log.sendEmail({
-            recipient: event.request.userAttributes.email,
-            status: "failed",
-          });
-        }
+          break;
+        case "CustomEmailSender_ForgotPassword":
+          await client.send(
+            new SendEmailCommand({
+              FromEmailAddress: Resource.RootUserEmail.value,
+              Destination: {
+                ToAddresses: [Resource.RootUserEmail.value],
+              },
+              Content: {
+                Simple: {
+                  Subject: {
+                    Data: "Reset your password",
+                  },
+                  Body: {
+                    Text: {
+                      Data: `Hi ${given_name},\nHere's your password reset code: ${temporaryPassword}`,
+                    },
+                  },
+                },
+              },
+            })
+          );
       }
+      Log.sendEmail({
+        recipient: event.request.userAttributes.email,
+        status: "sent",
+      });
+    } catch (error) {
+      console.error(error);
+      Log.sendEmail({
+        recipient: event.request.userAttributes.email,
+        status: "failed",
+      });
+    }
+  } else {
+    console.warn("No event request code received");
   }
 };
