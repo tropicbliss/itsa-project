@@ -19,6 +19,7 @@ import {
 } from "./database/validators";
 import { eq, and } from "drizzle-orm";
 import { Log } from "@itsa-project/core/logging";
+import { VisibleError } from "@itsa-project/core/errors";
 
 const schema = z.object({
   firstName: firstNameSchema.optional(),
@@ -53,7 +54,7 @@ export const handler = Util.handler(
       const countryCodeToCheck = input.countryCode ?? result.countryCode;
       const postalCodeToCheck = input.postalCode ?? result.postalCode;
       if (!isPostalCode(postalCodeToCheck, countryCodeToCheck)) {
-        throw new ZodError([]);
+        throw new VisibleError("Postal code is not valid given country code");
       }
       await tx
         .update(client)
