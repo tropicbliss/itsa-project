@@ -2,7 +2,7 @@ import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
 import { z } from "zod";
 import { db } from "./database/drizzle";
-import { client } from "./database/schema.sql";
+import { archive, client } from "./database/schema.sql";
 import {
   addressSchema,
   citySchema,
@@ -16,7 +16,7 @@ import {
   phoneNumberSchema,
   stateSchema,
 } from "./database/validators";
-import { eq } from "drizzle-orm";
+import { eq, and, or, sql } from "drizzle-orm";
 import { VisibleError } from "@itsa-project/core/errors";
 import { Log } from "@itsa-project/core/logging";
 
@@ -41,20 +41,42 @@ export const handler = Util.handler(
     allowedGroups: [Resource.UserGroups.agent],
   },
   async ({ body, userId }) => {
+    const input = schema.parse(body);
     const response = await db.transaction(async (tx) => {
-      const hasPreexistingClients = await tx
-        .select()
-        .from(client)
-        .where(eq(client.agentId, userId))
-        .limit(1)
-        .execute()
-        .then((row) => row.length > 0);
+      const [hasPreexistingClients, hasDuplicateInfo] = await Promise.all([
+        tx
+          .select()
+          .from(client)
+          .where(eq(client.agentId, userId))
+          .limit(1)
+          .execute()
+          .then((row) => row.length > 0),
+        tx
+          .select()
+          .from(archive)
+          .where(
+            and(
+              eq(archive.table, "client"),
+              or(
+                sql`${archive.data} ->> 'email_address' = ${input.emailAddress}`,
+                sql`${archive.data} ->> 'phone_number' = ${input.phoneNumber}`
+              )
+            )
+          )
+          .limit(1)
+          .execute()
+          .then((row) => row.length > 0),
+      ]);
       if (hasPreexistingClients) {
         throw new VisibleError(
           "An agent can only be responsible for one client"
         );
       }
-      const input = schema.parse(body);
+      if (hasDuplicateInfo) {
+        throw new VisibleError(
+          "System already includes an email or phone number that is the same"
+        );
+      }
       return await tx
         .insert(client)
         .values({

@@ -5,7 +5,10 @@ export function AgentDashboard() {
   return (
     <Button
       onClick={async () => {
-        const res = await get("/agent/transactions?page=1&limit=20");
+        const res = await post("/agent/email", {
+          subject: "Test",
+          body: "Test"
+        });
         console.log(res)
       }}
     >

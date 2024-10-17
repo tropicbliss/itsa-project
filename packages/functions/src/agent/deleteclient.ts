@@ -1,10 +1,8 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
-import { z } from "zod";
 import { db } from "./database/drizzle";
 import { client } from "./database/schema.sql";
-import { eq, and } from "drizzle-orm";
-import { clientIdSchema } from "./database/validators";
+import { eq } from "drizzle-orm";
 import { Log } from "@itsa-project/core/logging";
 
 export const handler = Util.handler(

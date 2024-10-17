@@ -379,6 +379,21 @@ api.route(
   routeMetadata
 );
 
+api.route(
+  "POST /agent/email",
+  {
+    link: [
+      userGroups,
+      clientDatabase,
+      email,
+      loggingQueue,
+      rootUserSecrets.email,
+    ],
+    handler: "packages/functions/src/agent/sendcustomemail.handler",
+  },
+  routeMetadata
+);
+
 new sst.aws.Function("InternalNightmareApi", {
   handler: "packages/functions/src/agent/internalnightmareapi.handler",
   url: true,
