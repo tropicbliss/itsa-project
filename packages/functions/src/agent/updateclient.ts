@@ -1,12 +1,11 @@
 import { Util } from "@itsa-project/core/util";
 import { Resource } from "sst";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 import { db } from "./database/drizzle";
 import { client } from "./database/schema.sql";
 import {
   addressSchema,
   citySchema,
-  clientIdSchema,
   countrySchema,
   dateOfBirthSchema,
   emailAddressSchema,
@@ -17,7 +16,7 @@ import {
   phoneNumberSchema,
   stateSchema,
 } from "./database/validators";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { Log } from "@itsa-project/core/logging";
 import { VisibleError } from "@itsa-project/core/errors";
 
