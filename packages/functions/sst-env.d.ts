@@ -39,6 +39,7 @@ declare module "sst" {
       "type": "sst.aws.Vpc"
     }
     "Email": {
+      "configSet": string
       "sender": string
       "type": "sst.aws.Email"
     }

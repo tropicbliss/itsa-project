@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.670.0",
-    "sst": "3.1.78"
+    "sst": "3.2.34"
   },
   "devDependencies": {
-    "vitest": "^2.1.2"
+    "vitest": "^2.1.3"
   }
 }
