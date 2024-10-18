@@ -93,7 +93,7 @@ export function LoginForm() {
                     <FormItem>
                       <div className="flex items-center">
                         <FormLabel>Password</FormLabel>
-                        <div className="ml-auto inline-block text-sm underline cursor-pointer" onClick={() => $authStatus.set({ status: "forgotPassword" })}>
+                        <div className="ml-auto inline-block text-sm underline cursor-pointer" onMouseDown={() => $authStatus.set({ status: "forgotPassword" })}>
                           Forgot your password?
                         </div>
                       </div>

@@ -92,7 +92,7 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
                         {qrcode && <TooltipProvider>
                             <Tooltip delayDuration={0}>
                                 <TooltipTrigger>
-                                    <QRCodeSVG onClick={async () => {
+                                    <QRCodeSVG onMouseDown={async () => {
                                         await navigator.clipboard.writeText(qrcode.raw)
                                         toast({
                                             title: "Copied to clipboard"
@@ -130,7 +130,7 @@ export const SetupTotpContainer: React.FC<ComponentProps> = ({ user }) => {
                         />
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                        <Button variant="outline" disabled={isLoading} onClick={() => $authStatus.set({ status: "authenticated" })}
+                        <Button variant="outline" disabled={isLoading} onMouseDown={() => $authStatus.set({ status: "authenticated" })}
                         >
                             Skip
                         </Button>

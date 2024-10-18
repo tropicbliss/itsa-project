@@ -10,12 +10,10 @@ declare module "sst" {
       "url": string
     }
     "ClientDatabase": {
-      "clusterArn": string
       "database": string
       "host": string
       "password": string
       "port": number
-      "secretArn": string
       "type": "sst.aws.Postgres"
       "username": string
     }
@@ -36,6 +34,7 @@ declare module "sst" {
       "type": "aws.cloudwatch/logStream.LogStream"
     }
     "DatabaseVPC": {
+      "bastion": string
       "type": "sst.aws.Vpc"
     }
     "Email": {

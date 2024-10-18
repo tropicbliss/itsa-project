@@ -18,7 +18,7 @@ export function Navbar() {
 
   async function handleLogout() {
     await Auth.signOut();
-    $authStatus.set({status: "unauthenticated"})
+    $authStatus.set({ status: "unauthenticated" })
     navigate("/");
   }
 
@@ -70,10 +70,10 @@ export function Navbar() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/settings")}>
+              <DropdownMenuItem onMouseDown={() => navigate("/settings")}>
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleLogout()}>
+              <DropdownMenuItem onMouseDown={() => handleLogout()}>
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

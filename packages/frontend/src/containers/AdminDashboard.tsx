@@ -119,7 +119,7 @@ export const columns: ColumnDef<Payment>[] = [
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onMouseDown={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Email
           <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -160,7 +160,7 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onMouseDown={() => navigator.clipboard.writeText(payment.id)}
             >
               Copy payment ID
             </DropdownMenuItem>
@@ -177,7 +177,7 @@ export const columns: ColumnDef<Payment>[] = [
 export function DataTableDemo() {
   return (
     <Button
-      onClick={async () => {
+      onMouseDown={async () => {
         const res = await post("/agent/verifyclient", {
           clientId: "e9d1b576-0879-4299-ac40-a63397ee18c4",
           contentType: "image/jpeg"
@@ -322,7 +322,7 @@ export function DataTableDemo() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.previousPage()}
+              onMouseDown={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
               Previous
@@ -330,7 +330,7 @@ export function DataTableDemo() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.nextPage()}
+              onMouseDown={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
               Next

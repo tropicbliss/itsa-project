@@ -138,7 +138,7 @@ export const ForgotPasswordSubmitContainer: React.FC<ComponentProps> = ({ userna
                             </div>
                         </CardContent>
                         <CardFooter className="flex justify-between">
-                            <Button variant="outline" disabled={form.formState.isSubmitting} onClick={() => $authStatus.set({ status: "forgotPassword" })}
+                            <Button variant="outline" disabled={form.formState.isSubmitting} onMouseDown={() => $authStatus.set({ status: "forgotPassword" })}
                             >
                                 Back
                             </Button>

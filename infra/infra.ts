@@ -132,7 +132,7 @@ export const userPool = new sst.aws.CognitoUserPool("UserPool", {
       handler: "packages/functions/src/email/cognitoemailsender.handler",
       link: [email, kmsKey, keyAlias, loggingQueue, rootUserSecrets.email],
     },
-    kmsKey: kmsKey.arn as any,
+    kmsKey: kmsKey.arn,
   },
   mfa: "optional",
   softwareToken: true,
@@ -221,10 +221,14 @@ new aws.cognito.UserInGroup("rootAdminInRootAdminGroup", {
   userPoolId: userPool.id,
 });
 
-export const clientDatabaseVpc = new sst.aws.Vpc("DatabaseVPC");
+export const clientDatabaseVpc = new sst.aws.Vpc("DatabaseVPC", {
+  bastion: true,
+  nat: "ec2",
+});
 
-export const clientDatabase = new sst.aws.Postgres.v1("ClientDatabase", {
+export const clientDatabase = new sst.aws.Postgres("ClientDatabase", {
   vpc: clientDatabaseVpc,
+  proxy: true,
 });
 
 new sst.x.DevCommand("DrizzleStudio", {

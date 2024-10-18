@@ -274,7 +274,7 @@ function MFASettings() {
         <CardTitle>Disable MFA</CardTitle>
       </CardHeader>
       <CardFooter className="border-t px-6 py-4">
-        <Button disabled={isLoading} onClick={async () => {
+        <Button disabled={isLoading} onMouseDown={async () => {
           try {
             setIsLoading(true)
             const user = await Auth.currentAuthenticatedUser();
@@ -304,7 +304,7 @@ function MFASettings() {
         <CardTitle>Set up MFA</CardTitle>
       </CardHeader>
       <CardFooter className="border-t px-6 py-4">
-        <Button disabled={isLoading} onClick={async () => {
+        <Button disabled={isLoading} onMouseDown={async () => {
           try {
             setIsLoading(true)
             const user = await Auth.currentAuthenticatedUser();

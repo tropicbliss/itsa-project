@@ -4,7 +4,7 @@ import { del, get, post, put } from "@/lib/fetchLib";
 export function AgentDashboard() {
   return (
     <Button
-      onClick={async () => {
+      onMouseDown={async () => {
         const res = await post("/agent/email", {
           subject: "Test",
           body: "Test"

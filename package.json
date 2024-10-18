@@ -10,11 +10,13 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
+    "@types/pg": "^8.11.10",
     "typescript": "5.6.3"
   },
   "dependencies": {
     "drizzle-kit": "^0.26.2",
     "drizzle-orm": "^0.35.2",
+    "pg": "^8.13.0",
     "sst": "3.2.34",
     "zod": "^3.23.8"
   }

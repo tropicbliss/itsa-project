@@ -1,13 +1,16 @@
 import { Resource } from "sst";
-import { drizzle } from "drizzle-orm/aws-data-api/pg";
-import { RDSDataClient } from "@aws-sdk/client-rds-data";
+import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "./schema.sql";
+import { Pool } from "pg";
 
-const client = new RDSDataClient({});
-
-export const db = drizzle(client, {
-  schema,
+const pool = new Pool({
+  host: Resource.ClientDatabase.host,
+  port: Resource.ClientDatabase.port,
+  user: Resource.ClientDatabase.username,
+  password: Resource.ClientDatabase.password,
   database: Resource.ClientDatabase.database,
-  secretArn: Resource.ClientDatabase.secretArn,
-  resourceArn: Resource.ClientDatabase.clusterArn,
+});
+
+export const db = drizzle(pool, {
+  schema,
 });

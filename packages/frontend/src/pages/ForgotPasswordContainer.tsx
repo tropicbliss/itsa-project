@@ -81,7 +81,7 @@ export function ForgotPasswordContainer() {
                             </div>
                         </CardContent>
                         <CardFooter className="flex justify-between">
-                            <Button variant="outline" disabled={form.formState.isSubmitting} onClick={() => $authStatus.set({ status: "unauthenticated" })}
+                            <Button variant="outline" disabled={form.formState.isSubmitting} onMouseDown={() => $authStatus.set({ status: "unauthenticated" })}
                             >
                                 Back
                             </Button>
