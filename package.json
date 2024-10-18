@@ -5,8 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "db": "sst shell drizzle-kit",
-    "db:studio": "sst shell drizzle-kit studio"
+    "db": "sst shell drizzle-kit"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
