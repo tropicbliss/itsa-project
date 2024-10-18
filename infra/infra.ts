@@ -227,6 +227,14 @@ export const clientDatabase = new sst.aws.Postgres.v1("ClientDatabase", {
   vpc: clientDatabaseVpc,
 });
 
+new sst.x.DevCommand("DrizzleStudio", {
+  link: [clientDatabase],
+  dev: {
+    autostart: true,
+    command: "npx drizzle-kit studio",
+  },
+});
+
 const mainframeSecrets = Object.values({
   ipAddress: new sst.Secret("MainframeIpAddress"),
   username: new sst.Secret("MainframeUsername"),
